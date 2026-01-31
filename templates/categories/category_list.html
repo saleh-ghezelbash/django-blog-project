@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">Categories</h1>
+        <div class="row">
+            {% for category in categories %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a href="{% url 'category_posts' category.slug %}" class="text-decoration-none">
+                                {{ category.name }}
+                            </a>
+                        </h5>
+                        <p class="card-text text-muted">
+                            {{ category.description|truncatechars:100 }}
+                        </p>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <small class="text-muted">
+                            {{ category.posts.count }} posts
+                        </small>
+                        <a href="{% url 'category_posts' category.slug %}" class="btn btn-sm btn-outline-primary float-end">
+                            View Posts
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    No categories available yet.
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
