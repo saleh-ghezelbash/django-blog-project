@@ -60,6 +60,13 @@ class Post(models.Model):
         self.view_count += 1
         self.save(update_fields=['view_count'])
 
+    def get_read_time(self):
+        """Calculate estimated reading time in minutes"""
+        # Average reading speed: 200-250 words per minute
+        word_count = len(self.content.split())
+        reading_time = max(1, word_count // 200)  # At least 1 minute
+        return reading_time
+
 class PostImage(models.Model):
     post = models.ForeignKey(Post, related_name='images', on_delete=models.CASCADE)
     image = models.ImageField(upload_to='post_images/')

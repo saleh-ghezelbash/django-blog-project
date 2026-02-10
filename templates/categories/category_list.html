@@ -1,41 +1,260 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Categories - Story Blog{% endblock %}
+{% block description %}Browse all blog categories{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-12">
-        <h1 class="mb-4">Categories</h1>
-        <div class="row">
+<!-- Page Title -->
+<div class="page-title">
+  <div class="heading">
+    <div class="container">
+      <div class="row d-flex justify-content-center text-center">
+        <div class="col-lg-8">
+          <h1 class="heading-title">Blog Categories</h1>
+          <p class="mb-0">Explore our diverse range of blog categories covering various topics and interests.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <nav class="breadcrumbs">
+    <div class="container">
+      <ol>
+        <li><a href="{% url 'home' %}">Home</a></li>
+        <li class="current">Categories</li>
+      </ol>
+    </div>
+  </nav>
+</div><!-- End Page Title -->
+
+<div class="container">
+  <div class="row">
+
+    <div class="col-lg-8">
+
+      <!-- Category Posts Section -->
+      <section id="category-posts" class="category-posts section">
+        <div class="container" data-aos="fade-up" data-aos-delay="100">
+          <div class="row gy-5">
             {% for category in categories %}
-            <div class="col-md-4 mb-4">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">
-                            <a href="{% url 'category_posts' category.slug %}" class="text-decoration-none">
-                                {{ category.name }}
-                            </a>
-                        </h5>
-                        <p class="card-text text-muted">
-                            {{ category.description|truncatechars:100 }}
-                        </p>
-                    </div>
-                    <div class="card-footer bg-transparent">
-                        <small class="text-muted">
-                            {{ category.posts.count }} posts
-                        </small>
-                        <a href="{% url 'category_posts' category.slug %}" class="btn btn-sm btn-outline-primary float-end">
-                            View Posts
-                        </a>
-                    </div>
+            <div class="col-lg-6" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:1 }}00">
+              <article class="category-card">
+                <div class="post-img">
+                  {% if category.posts.first and category.posts.first.featured_image %}
+                  <img src="{{ category.posts.first.featured_image.url }}" alt="{{ category.name }}" class="img-fluid" style="height: 250px; object-fit: cover;">
+                  {% else %}
+                  <img src="{% static 'assets/img/blog/blog-post-1.webp' %}" alt="{{ category.name }}" class="img-fluid">
+                  {% endif %}
                 </div>
-            </div>
+
+                <div class="meta-top">
+                  <ul>
+                    <li class="d-flex align-items-center">
+                      <a href="{% url 'category_posts' category.slug %}">{{ category.name }}</a>
+                    </li>
+                    <li class="d-flex align-items-center">
+                      <i class="bi bi-dot"></i> 
+                      <a href="{% url 'category_posts' category.slug %}">
+                        {{ category.posts.count }} posts
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+
+                <h2 class="title">
+                  <a href="{% url 'category_posts' category.slug %}">{{ category.name }}</a>
+                </h2>
+                
+                {% if category.description %}
+                <p class="category-description">{{ category.description|truncatechars:100 }}</p>
+                {% endif %}
+                
+                <a href="{% url 'category_posts' category.slug %}" class="btn-view-category">
+                  View All Posts <i class="bi bi-arrow-right"></i>
+                </a>
+              </article>
+            </div><!-- End category item -->
             {% empty %}
             <div class="col-12">
-                <div class="alert alert-info">
-                    No categories available yet.
-                </div>
+              <div class="text-center py-5">
+                <h3>No categories available yet.</h3>
+                <p>Check back soon or create some categories in the admin panel.</p>
+              </div>
             </div>
             {% endfor %}
+          </div><!-- End category list -->
         </div>
+      </section><!-- /Category Posts Section -->
+
+      <!-- Pagination Section -->
+      {% if categories.has_other_pages %}
+      <section id="pagination" class="pagination section">
+        <div class="container">
+          <div class="d-flex justify-content-center">
+            <ul class="pagination-list">
+              {% if categories.has_previous %}
+              <li>
+                <a href="?page={{ categories.previous_page_number }}">
+                  <i class="bi bi-chevron-left"></i>
+                </a>
+              </li>
+              {% endif %}
+
+              {% for num in categories.paginator.page_range %}
+                {% if categories.number == num %}
+                <li><a href="#" class="active">{{ num }}</a></li>
+                {% elif num > categories.number|add:'-3' and num < categories.number|add:'3' %}
+                <li><a href="?page={{ num }}">{{ num }}</a></li>
+                {% endif %}
+              {% endfor %}
+
+              {% if categories.has_next %}
+              <li>
+                <a href="?page={{ categories.next_page_number }}">
+                  <i class="bi bi-chevron-right"></i>
+                </a>
+              </li>
+              {% endif %}
+            </ul>
+          </div>
+        </div>
+      </section><!-- /Pagination Section -->
+      {% endif %}
+
     </div>
+
+    <div class="col-lg-4 sidebar">
+
+      <div class="widgets-container">
+
+        <!-- Search Widget -->
+        <div class="search-widget widget-item" data-aos="fade-left" data-aos-delay="200">
+          <h3 class="widget-title">Search</h3>
+          <form action="{% url 'search' %}" method="GET">
+            <input type="text" name="q" placeholder="Search posts...">
+            <button type="submit" title="Search"><i class="bi bi-search"></i></button>
+          </form>
+        </div><!--/Search Widget -->
+
+        <!-- Categories Widget -->
+        <div class="categories-widget widget-item" data-aos="fade-left" data-aos-delay="300">
+          <h3 class="widget-title">All Categories</h3>
+          <ul class="mt-3">
+            {% for category in categories|slice:":10" %}
+            <li>
+              <a href="{% url 'category_posts' category.slug %}">
+                {{ category.name }} 
+                <span>({{ category.posts.count }})</span>
+              </a>
+            </li>
+            {% endfor %}
+          </ul>
+          {% if categories.count > 10 %}
+          <a href="{% url 'category_list' %}" class="view-all-link">View All Categories</a>
+          {% endif %}
+        </div><!--/Categories Widget -->
+
+        <!-- Recent Posts Widget -->
+        <div class="recent-posts-widget widget-item" data-aos="fade-left" data-aos-delay="400">
+          <h3 class="widget-title">Recent Posts</h3>
+          {% for post in recent_posts|slice:":5" %}
+          <div class="post-item">
+            {% if post.featured_image %}
+            <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="flex-shrink-0" style="width: 80px; height: 80px; object-fit: cover;">
+            {% else %}
+            <img src="{% static 'assets/img/blog/blog-post-square-1.webp' %}" alt="" class="flex-shrink-0">
+            {% endif %}
+            <div>
+              <h4>
+                <a href="{{ post.get_absolute_url }}">{{ post.title|truncatechars:40 }}</a>
+              </h4>
+              <time datetime="{{ post.published_date|date:'Y-m-d' }}">
+                {{ post.published_date|date:"M d, Y" }}
+              </time>
+            </div>
+          </div><!-- End recent post item-->
+          {% endfor %}
+        </div><!--/Recent Posts Widget -->
+
+        <!-- Tags Widget -->
+        <div class="tags-widget widget-item" data-aos="fade-left" data-aos-delay="500">
+          <h3 class="widget-title">Popular Tags</h3>
+          <ul class="tag-cloud">
+            {% for tag in popular_tags %}
+            <li>
+              <a href="{% url 'tag_posts' tag.slug %}">{{ tag.name }}</a>
+            </li>
+            {% empty %}
+            {% for tag in default_tags %}
+            <li><a href="#">{{ tag }}</a></li>
+            {% endfor %}
+            {% endfor %}
+          </ul>
+        </div><!--/Tags Widget -->
+
+      </div>
+
+    </div>
+
+  </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize AOS
+    AOS.init({
+      duration: 800,
+      once: true,
+      offset: 100
+    });
+    
+    // Search form focus
+    const searchInput = document.querySelector('.search-widget input[type="text"]');
+    const searchForm = document.querySelector('.search-widget form');
+    
+    if (searchForm) {
+      searchForm.addEventListener('submit', function(e) {
+        const query = searchInput.value.trim();
+        if (!query) {
+          e.preventDefault();
+          searchInput.focus();
+        }
+      });
+    }
+    
+    // Add active class to current category in sidebar
+    const currentUrl = window.location.pathname;
+    const categoryLinks = document.querySelectorAll('.categories-widget a');
+    
+    categoryLinks.forEach(link => {
+      if (link.getAttribute('href') === currentUrl) {
+        link.classList.add('active');
+      }
+    });
+    
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        if (this.getAttribute('href') === '#') {
+          e.preventDefault();
+          return;
+        }
+        
+        const targetId = this.getAttribute('href');
+        if (targetId.startsWith('#')) {
+          e.preventDefault();
+          const targetElement = document.querySelector(targetId);
+          if (targetElement) {
+            window.scrollTo({
+              top: targetElement.offsetTop - 100,
+              behavior: 'smooth'
+            });
+          }
+        }
+      });
+    });
+  });
+</script>
 {% endblock %}

@@ -11,17 +11,28 @@ from comments.models import Comment
 from taggit.models import Tag
 
 def home(request):
-    featured_posts = Post.objects.filter(status='published', featured_image__isnull=False).order_by('-published_date')[:3]
-    latest_posts = Post.objects.filter(status='published').order_by('-published_date')[:6]
-    popular_posts = Post.objects.filter(status='published').order_by('-view_count')[:5]
+    featured_posts = Post.objects.filter(
+        status='published', 
+        featured_image__isnull=False
+    ).order_by('-published_date')[:10]
     
-    categories = Category.objects.annotate(post_count=Count('posts'))
+    latest_posts = Post.objects.filter(status='published').order_by('-published_date')[:20]
+    
+    # If not enough featured posts, use latest posts as fallback
+    if not featured_posts.exists():
+        featured_posts = latest_posts[:5]
+    
+    categories = Category.objects.annotate(post_count=Count('posts'))[:8]
+    
+    # Get popular tags
+    from taggit.models import Tag
+    popular_tags = Tag.objects.all()[:10]
     
     return render(request, 'posts/home.html', {
         'featured_posts': featured_posts,
         'latest_posts': latest_posts,
-        'popular_posts': popular_posts,
         'categories': categories,
+        'popular_tags': popular_tags,
     })
 
 def post_list(request):
@@ -61,6 +72,7 @@ def post_list(request):
         'categories': categories,
     })
 
+
 def post_detail(request, year, month, day, slug):
     post = get_object_or_404(
         Post,
@@ -79,6 +91,12 @@ def post_detail(request, year, month, day, slug):
         tags__in=post.tags.all(),
         status='published'
     ).exclude(id=post.id).distinct()[:3]
+    
+    # Get author's published posts (excluding current post)
+    author_posts = Post.objects.filter(
+        author=post.author,
+        status='published'
+    ).exclude(id=post.id).order_by('-published_date')[:3]
     
     # Get comments
     comments = post.comments.filter(active=True).order_by('-created_at')
@@ -99,6 +117,7 @@ def post_detail(request, year, month, day, slug):
     return render(request, 'posts/post_detail.html', {
         'post': post,
         'related_posts': related_posts,
+        'author_posts': author_posts,  # Add this
         'comments': comments,
         'comment_form': comment_form,
     })

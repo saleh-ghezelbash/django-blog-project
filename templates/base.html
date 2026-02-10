@@ -1,214 +1,240 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Django Blog{% endblock %}</title>
-    
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Custom CSS -->
-    <style>
-        body {
-            padding-top: 56px;
-        }
-        .navbar-brand {
-            font-weight: bold;
-            font-size: 1.5rem;
-        }
-        .featured-post {
-            height: 400px;
-            background-size: cover;
-            background-position: center;
-            position: relative;
-        }
-        .featured-post-content {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(transparent, rgba(0,0,0,0.8));
-            color: white;
-            padding: 20px;
-        }
-        .post-card {
-            transition: transform 0.3s;
-            height: 100%;
-        }
-        .post-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        }
-        .post-meta {
-            color: #6c757d;
-            font-size: 0.9rem;
-        }
-        .category-badge {
-            text-decoration: none;
-        }
-        .comment {
-            border-left: 3px solid #007bff;
-            padding-left: 15px;
-            margin-bottom: 20px;
-        }
-        .profile-pic {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-        .social-links a {
-            margin: 0 10px;
-            font-size: 1.2rem;
-        }
-    </style>
-    {% block extra_css %}{% endblock %}
-</head>
-<body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-        <div class="container">
-            <a class="navbar-brand" href="{% url 'home' %}">DjangoBlog</a>
-            
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'home' %}">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'post_list' %}">All Posts</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="categoriesDropdown" role="button" data-bs-toggle="dropdown">
-                            Categories
-                        </a>
-                        <div class="dropdown-menu">
-                            {% for category in categories %}
-                                <a class="dropdown-item" href="{% url 'category_posts' category.slug %}">
-                                    {{ category.name }}
-                                </a>
-                            {% endfor %}
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="{% url 'category_list' %}">All Categories</a>
-                        </div>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'tag_list' %}">Tags</a>
-                    </li>
-                </ul>
-                
-                <!-- Search Form -->
-                <form class="d-flex me-2" action="{% url 'search' %}" method="GET">
-                    <input class="form-control me-2" type="search" name="q" placeholder="Search posts..." aria-label="Search">
-                    <button class="btn btn-outline-light" type="submit">Search</button>
-                </form>
-                
-                <!-- Auth Links -->
-                <ul class="navbar-nav">
-                    {% if user.is_authenticated %}
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-user"></i> {{ user.username }}
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-end">
-                                <a class="dropdown-item" href="{% url 'profile' %}">Profile</a>
-                                <a class="dropdown-item" href="{% url 'post_create' %}">Create Post</a>
-                                <div class="dropdown-divider"></div>
-                                {% if user.is_staff %}
-                                    <a class="dropdown-item" href="/admin/">Admin Panel</a>
-                                    <div class="dropdown-divider"></div>
-                                {% endif %}
-                                <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
-                            </div>
-                        </li>
-                    {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'login' %}">Login</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'register' %}">Register</a>
-                        </li>
-                    {% endif %}
-                </ul>
-            </div>
-        </div>
-    </nav>
 
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>{% block title %}Story Blog{% endblock %}</title>
+  <meta name="description" content="{% block description %}A modern blog platform built with Django{% endblock %}">
+  <meta name="keywords" content="{% block keywords %}blog, django, python, web development{% endblock %}">
+
+  <!-- Favicons -->
+  <link href="/static/assets/img/favicon.png" rel="icon">
+  <link href="/static/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="/static/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/static/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/static/assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="/static/assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="/static/assets/css/main.css" rel="stylesheet">
+  {% block extra_css %}{% endblock %}
+
+  <!-- =======================================================
+  * Template Name: Story
+  * Template URL: https://bootstrapmade.com/story-bootstrap-blog-template/
+  * Updated: Aug 11 2025 with Bootstrap v5.3.7
+  * Author: BootstrapMade.com
+  * License: https://bootstrapmade.com/license/
+  ======================================================== -->
+</head>
+
+<body class="index-page">
+
+  <header id="header" class="header d-flex align-items-center position-relative">
+    <div class="container position-relative d-flex align-items-center justify-content-between">
+
+      <a href="{% url 'home' %}" class="logo d-flex align-items-center me-auto me-xl-0">
+        <!-- Uncomment the line below if you also wish to use an image logo -->
+        <!-- <img src="/static/assets/img/logo.webp" alt=""> -->
+        <h1 class="sitename">Story Blog</h1>
+      </a>
+
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="{% url 'home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">Home</a></li>
+          <li><a href="{% url 'post_list' %}">All Posts</a></li>
+          <li><a href="{% url 'category_list' %}">Categories</a></li>
+          <li><a href="{% url 'tag_list' %}">Tags</a></li>
+          <li class="dropdown">
+            <a href="#"><span>Pages</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+            <ul>
+              <li><a href="{% url 'post_create' %}">Create Post</a></li>
+              <li><a href="{% url 'search' %}">Search</a></li>
+              {% if user.is_authenticated %}
+              <li><a href="{% url 'profile' %}">My Profile</a></li>
+              {% endif %}
+            </ul>
+          </li>
+          {% if user.is_authenticated %}
+          <li class="dropdown">
+            <a href="#"><span>{{ user.username }}</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+            <ul>
+              <li><a href="{% url 'profile' %}">Profile</a></li>
+              <li><a href="{% url 'post_create' %}">Create Post</a></li>
+              <li><a href="{% url 'change_password' %}">Change Password</a></li>
+              {% if user.is_staff %}
+              <li><a href="/admin/">Admin Panel</a></li>
+              {% endif %}
+              <li><a href="{% url 'logout' %}">Logout</a></li>
+            </ul>
+          </li>
+          {% else %}
+          <li><a href="{% url 'login' %}">Login</a></li>
+          <li><a href="{% url 'register' %}">Register</a></li>
+          {% endif %}
+        </ul>
+        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+      </nav>
+
+      <div class="header-social-links">
+        <a href="#" class="twitter"><i class="bi bi-twitter-x"></i></a>
+        <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
+        <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
+        <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
+      </div>
+
+    </div>
+  </header>
+
+  <main class="main">
     <!-- Messages -->
+    {% if messages %}
     <div class="container mt-3">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            {% endfor %}
-        {% endif %}
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer id="footer" class="footer position-relative light-background">
+
+    <div class="container">
+      <div class="row gy-5">
+
+        <div class="col-lg-4">
+          <div class="footer-brand">
+            <a href="{% url 'home' %}" class="logo d-flex align-items-center mb-3">
+              <span class="sitename">Story Blog</span>
+            </a>
+            <p class="tagline">A modern blog platform built with Django and Bootstrap 5.</p>
+
+            <div class="social-links mt-4">
+              <a href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+              <a href="#" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+              <a href="#" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
+              <a href="#" aria-label="Twitter"><i class="bi bi-twitter-x"></i></a>
+              <a href="#" aria-label="Github"><i class="bi bi-github"></i></a>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="footer-links-grid">
+            <div class="row">
+              <div class="col-6 col-md-4">
+                <h5>Blog</h5>
+                <ul class="list-unstyled">
+                  <li><a href="{% url 'post_list' %}">All Posts</a></li>
+                  <li><a href="{% url 'category_list' %}">Categories</a></li>
+                  <li><a href="{% url 'tag_list' %}">Tags</a></li>
+                  <li><a href="{% url 'post_create' %}">Create Post</a></li>
+                </ul>
+              </div>
+              <div class="col-6 col-md-4">
+                <h5>Account</h5>
+                <ul class="list-unstyled">
+                  {% if user.is_authenticated %}
+                  <li><a href="{% url 'profile' %}">My Profile</a></li>
+                  <li><a href="{% url 'change_password' %}">Change Password</a></li>
+                  <li><a href="{% url 'logout' %}">Logout</a></li>
+                  {% else %}
+                  <li><a href="{% url 'login' %}">Login</a></li>
+                  <li><a href="{% url 'register' %}">Register</a></li>
+                  {% endif %}
+                  {% if user.is_staff %}
+                  <li><a href="/admin/">Admin Panel</a></li>
+                  {% endif %}
+                </ul>
+              </div>
+              <div class="col-6 col-md-4">
+                <h5>Support</h5>
+                <ul class="list-unstyled">
+                  <li><a href="#">Help Center</a></li>
+                  <li><a href="#">Contact Us</a></li>
+                  <li><a href="#">Privacy Policy</a></li>
+                  <li><a href="#">Terms of Service</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-2">
+          <div class="footer-cta">
+            <h5>Let's Connect</h5>
+            <a href="#" class="btn btn-outline">Get in Touch</a>
+          </div>
+        </div>
+
+      </div>
     </div>
 
-    <!-- Main Content -->
-    <main class="container py-4">
-        {% block content %}{% endblock %}
-    </main>
-
-    <!-- Footer -->
-    <footer class="bg-dark text-white py-4 mt-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4">
-                    <h5>DjangoBlog</h5>
-                    <p>A complete blog platform built with Django.</p>
-                </div>
-                <div class="col-md-4">
-                    <h5>Quick Links</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="{% url 'home' %}" class="text-white text-decoration-none">Home</a></li>
-                        <li><a href="{% url 'post_list' %}" class="text-white text-decoration-none">All Posts</a></li>
-                        <li><a href="{% url 'category_list' %}" class="text-white text-decoration-none">Categories</a></li>
-                        <li><a href="{% url 'tag_list' %}" class="text-white text-decoration-none">Tags</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-4">
-                    <h5>Connect</h5>
-                    <div class="social-links">
-                        <a href="#" class="text-white"><i class="fab fa-twitter"></i></a>
-                        <a href="#" class="text-white"><i class="fab fa-facebook"></i></a>
-                        <a href="#" class="text-white"><i class="fab fa-github"></i></a>
-                    </div>
-                </div>
+    <div class="footer-bottom">
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <div class="footer-bottom-content">
+              <p class="mb-0">© <strong>Story Blog</strong>. All rights reserved. {% now "Y" %}</p>
+              <div class="credits">
+                Template by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+              </div>
             </div>
-            <hr class="bg-light">
-            <div class="text-center">
-                <p>&copy; {% now "Y" %} DjangoBlog. All rights reserved.</p>
-            </div>
+          </div>
         </div>
-    </footer>
+      </div>
+    </div>
 
-    <!-- Bootstrap 5 JS Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- CKEditor -->
-    <script src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js"></script>
-    
-    {% block extra_js %}{% endblock %}
-    
-    <script>
-        // Initialize CKEditor
-        {% if form and form.content %}
-            CKEDITOR.replace('id_content');
-        {% endif %}
-        
-        // Auto-dismiss alerts after 5 seconds
-        setTimeout(function() {
-            $('.alert').alert('close');
-        }, 5000);
-    </script>
+  </footer>
+
+  <!-- Scroll Top -->
+  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Preloader -->
+  <div id="preloader"></div>
+
+  <!-- Vendor JS Files -->
+  <script src="/static/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="/static/assets/vendor/aos/aos.js"></script>
+  <script src="/static/assets/vendor/swiper/swiper-bundle.min.js"></script>
+  <script src="/static/assets/vendor/purecounter/purecounter_vanilla.js"></script>
+
+  <!-- Main JS File -->
+  <script src="/static/assets/js/main.js"></script>
+
+  <!-- Custom JS -->
+  <script>
+    // Initialize AOS
+    AOS.init({
+      duration: 1000,
+      once: true,
+    });
+
+    // Auto-dismiss alerts after 5 seconds
+    setTimeout(function() {
+      const alerts = document.querySelectorAll('.alert');
+      alerts.forEach(alert => {
+        const bsAlert = new bootstrap.Alert(alert);
+        bsAlert.close();
+      });
+    }, 5000);
+  </script>
+
+  {% block extra_js %}{% endblock %}
+
 </body>
+
 </html>
