@@ -28,6 +28,10 @@ urlpatterns = [
     path('tags/', include('tags.urls')),
     path('comments/', include('comments.urls')),
     path('users/', include('users.urls')),
+
+    path('newsletter/', include('newsletter.urls')),
+    path('about/', TemplateView.as_view(template_name='about.html'), name='about'),
+    path('author/list/', author_list, name='author_list'),
     
     # CKEditor
     path('ckeditor/', include('ckeditor_uploader.urls')),

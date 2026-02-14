@@ -1,0 +1,91 @@
+{% load static %}
+
+<div class="my-4 d-flex" id="comment-{{ comment.id }}">
+    <img class="avatar avatar-md rounded-circle float-start me-3" 
+         src="{% if comment.author and comment.author.profile_picture %}{{ comment.author.profile_picture.url }}{% else %}{% static 'assets/images/avatar/default.jpg' %}{% endif %}" 
+         alt="{{ comment.author.username|default:comment.name }}">
+    <div class="flex-grow-1">
+        <div class="mb-2">
+            <h5 class="m-0">
+                {% if comment.author %}
+                <a href="{% url 'user_profile' comment.author.username %}">{{ comment.author.get_full_name|default:comment.author.username }}</a>
+                {% else %}
+                {{ comment.name }}
+                {% endif %}
+            </h5>
+            <span class="me-3 small text-muted">{{ comment.created_at|date:"F d, Y at h:i A" }}</span>
+            
+            <!-- Vote buttons -->
+            <span class="vote-buttons ms-3">
+                <button class="btn btn-sm btn-outline-success vote-btn" 
+                        data-comment-id="{{ comment.id }}" 
+                        data-vote="1">
+                    <i class="bi bi-hand-thumbs-up"></i>
+                    <span class="count">{{ comment.votes.filter.vote=1.count }}</span>
+                </button>
+                <button class="btn btn-sm btn-outline-danger vote-btn" 
+                        data-comment-id="{{ comment.id }}" 
+                        data-vote="-1">
+                    <i class="bi bi-hand-thumbs-down"></i>
+                    <span class="count">{{ comment.votes.filter.vote=-1.count }}</span>
+                </button>
+                <span class="badge bg-secondary" id="score-{{ comment.id }}">
+                    Score: {{ comment.votes.all.vote_sum|default:0 }}
+                </span>
+            </span>
+            
+            <!-- Action buttons -->
+            <span class="action-buttons ms-3">
+                <a href="#" class="text-body fw-normal reply-btn" 
+                   data-comment-id="{{ comment.id }}" 
+                   data-author="{{ comment.author.username|default:comment.name }}">Reply</a>
+                
+                {% if user == comment.author or user.is_staff %}
+                <a href="{% url 'comment_delete' comment.id %}" 
+                   class="text-danger fw-normal ms-2"
+                   onclick="return confirm('Are you sure you want to delete this comment?');">Delete</a>
+                {% endif %}
+                
+                {% if user.is_authenticated and user != comment.author %}
+                <a href="#" class="text-warning fw-normal ms-2 report-btn" 
+                   data-comment-id="{{ comment.id }}">Report</a>
+                {% endif %}
+            </span>
+        </div>
+        
+        <p>{{ comment.content|linebreaks }}</p>
+        
+        <!-- Reply form (hidden by default) -->
+        <div class="reply-form d-none mt-3" id="reply-form-{{ comment.id }}">
+            <form method="post" action="{% url 'reply_comment' comment.id %}" class="reply-form">
+                {% csrf_token %}
+                <input type="hidden" name="parent" value="{{ comment.id }}">
+                
+                {% if not user.is_authenticated %}
+                <div class="row mb-2">
+                    <div class="col-md-6">
+                        <input type="text" name="name" class="form-control form-control-sm" placeholder="Your name" required>
+                    </div>
+                    <div class="col-md-6">
+                        <input type="email" name="email" class="form-control form-control-sm" placeholder="Your email" required>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <textarea name="content" class="form-control form-control-sm mb-2" rows="2" placeholder="Write your reply..." required></textarea>
+                
+                <button type="submit" class="btn btn-sm btn-primary">Post Reply</button>
+                <button type="button" class="btn btn-sm btn-secondary cancel-reply">Cancel</button>
+            </form>
+        </div>
+        
+        <!-- Replies -->
+        {% if comment.get_replies %}
+        <div class="replies mt-3 ps-4 border-start border-2">
+            {% for reply in comment.get_replies %}
+                {% include 'comments/comment_thread.html' with comment=reply %}
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>

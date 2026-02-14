@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'comments.apps.CommentsConfig',
     'categories.apps.CategoriesConfig',
     'users.apps.UsersConfig',
+    'newsletter.apps.NewsletterConfig',
 ]
 
 MIDDLEWARE = [
