@@ -9,31 +9,79 @@ from .forms import PostForm, CommentForm
 from categories.models import Category
 from comments.models import Comment
 from taggit.models import Tag
+from newsletter.models import Subscriber
 
 def home(request):
-    featured_posts = Post.objects.filter(
-        status='published', 
+    """Home page view with all sections"""
+    
+    # Hero posts (featured posts)
+    hero_posts = Post.objects.filter(
+        status='published',
         featured_image__isnull=False
-    ).order_by('-published_date')[:10]
+    ).order_by('-published_date')[:5]
     
-    latest_posts = Post.objects.filter(status='published').order_by('-published_date')[:20]
+    # Highlights posts (recent popular posts)
+    highlights_posts = Post.objects.filter(
+        status='published'
+    ).order_by('-views_count', '-published_date')[:8]
     
-    # If not enough featured posts, use latest posts as fallback
-    if not featured_posts.exists():
-        featured_posts = latest_posts[:5]
+    # Top highlights (last week's most viewed)
+    from django.utils import timezone
+    from datetime import timedelta
     
-    categories = Category.objects.annotate(post_count=Count('posts'))[:8]
+    last_week = timezone.now() - timedelta(days=7)
+    top_highlights = Post.objects.filter(
+        status='published',
+        published_date__gte=last_week
+    ).order_by('-views_count')[:5]
     
-    # Get popular tags
-    from taggit.models import Tag
-    popular_tags = Tag.objects.all()[:10]
+    # Trending categories
+    trending_categories = Category.objects.annotate(
+        post_count=Count('posts')
+    ).filter(post_count__gt=0).order_by('-post_count')[:8]
     
-    return render(request, 'posts/home.html', {
-        'featured_posts': featured_posts,
-        'latest_posts': latest_posts,
-        'categories': categories,
+    # Sports posts
+    sports_category = Category.objects.filter(name__icontains='sport').first()
+    if sports_category:
+        sports_posts = Post.objects.filter(
+            category=sports_category,
+            status='published'
+        ).order_by('-published_date')[:4]
+    else:
+        sports_posts = Post.objects.filter(
+            status='published'
+        ).order_by('-published_date')[:4]
+    
+    # Sponsored posts
+    sponsored_posts = Post.objects.filter(
+        status='published',
+        is_sponsored=True
+    ).order_by('-published_date')[:6]
+    
+    # If not enough sponsored posts, get regular ones
+    if sponsored_posts.count() < 6:
+        regular_posts = Post.objects.filter(
+            status='published',
+            is_sponsored=False
+        ).order_by('-published_date')[:6 - sponsored_posts.count()]
+        sponsored_posts = list(sponsored_posts) + list(regular_posts)
+    
+    # Popular tags
+    popular_tags = Tag.objects.annotate(
+        post_count=Count('taggit_taggeditem_items')
+    ).order_by('-post_count')[:15]
+    
+    context = {
+        'hero_posts': hero_posts,
+        'highlights_posts': highlights_posts,
+        'top_highlights': top_highlights,
+        'trending_categories': trending_categories,
+        'sports_posts': sports_posts,
+        'sponsored_posts': sponsored_posts,
         'popular_tags': popular_tags,
-    })
+    }
+    
+    return render(request, 'posts/home.html', context)
 
 def post_list(request):
     posts_list = Post.objects.filter(status='published').order_by('-published_date')
@@ -178,3 +226,26 @@ def search(request):
         'query': query,
         'results': results
     })
+
+def newsletter_subscribe(request):
+    """Handle newsletter subscription"""
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        if email:
+            subscriber, created = Subscriber.objects.get_or_create(
+                email=email,
+                defaults={'is_active': True}
+            )
+            if created:
+                messages.success(request, 'Thank you for subscribing!')
+            else:
+                if not subscriber.is_active:
+                    subscriber.is_active = True
+                    subscriber.save()
+                    messages.success(request, 'Your subscription has been reactivated!')
+                else:
+                    messages.info(request, 'You are already subscribed!')
+        else:
+            messages.error(request, 'Please provide a valid email address.')
+    
+    return redirect('home')

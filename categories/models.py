@@ -8,6 +8,14 @@ class Category(models.Model):
     description = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    image = models.ImageField(upload_to='category_images/', blank=True, null=True)
+    color = models.CharField(max_length=20, default='primary', 
+                            choices=[('primary', 'Primary'), 
+                                    ('danger', 'Danger'), 
+                                    ('success', 'Success'),
+                                    ('warning', 'Warning'),
+                                    ('info', 'Info')])
     
     class Meta:
         verbose_name_plural = "Categories"

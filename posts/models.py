@@ -33,11 +33,17 @@ class Post(models.Model):
     tags = TaggableManager(blank=True)
     
     view_count = models.PositiveIntegerField(default=0)
+
+    is_sponsored = models.BooleanField(default=False)
+    rating = models.DecimalField(max_digits=3, decimal_places=1, null=True, blank=True)
+    views_count = models.PositiveIntegerField(default=0)
     
     class Meta:
         ordering = ('-published_date',)
         indexes = [
             models.Index(fields=['-published_date']),
+            models.Index(fields=['is_sponsored']),
+            models.Index(fields=['category']),
         ]
     
     def __str__(self):
@@ -66,6 +72,12 @@ class Post(models.Model):
         word_count = len(self.content.split())
         reading_time = max(1, word_count // 200)  # At least 1 minute
         return reading_time
+    
+    def get_rating_display(self):
+        """Display rating with stars"""
+        if not self.rating:
+            return 'Not rated'
+        return f'{self.rating} / 10'
 
 class PostImage(models.Model):
     post = models.ForeignKey(Post, related_name='images', on_delete=models.CASCADE)

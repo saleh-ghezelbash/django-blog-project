@@ -1,570 +1,351 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load crispy_forms_tags %}
-
-{% block title %}{{ post.title }} - Story Blog{% endblock %}
-{% block description %}{{ post.excerpt|default:post.content|striptags|truncatechars:160 }}{% endblock %}
-{% block keywords %}{{ post.category.name }}, {% for tag in post.tags.all %}{{ tag.name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endblock %}
-
 
 {% block content %}
-<!-- Page Title -->
-<div class="page-title">
-  <div class="heading">
-    <div class="container">
-      <div class="row d-flex justify-content-center text-center">
-        <div class="col-lg-8">
-          <h1 class="heading-title">{{ post.title }}</h1>
-          <p class="mb-0">
-            {{ post.excerpt|default:post.content|striptags|truncatechars:200 }}
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-  <nav class="breadcrumbs">
-    <div class="container">
-      <ol>
-        <li><a href="{% url 'home' %}">Home</a></li>
-        <li><a href="{% url 'post_list' %}">Blog</a></li>
-        {% if post.category %}
-        <li><a href="{% url 'category_posts' post.category.slug %}">{{ post.category.name }}</a></li>
-        {% endif %}
-        <li class="current">{{ post.title|truncatechars:30 }}</li>
-      </ol>
-    </div>
-  </nav>
-</div><!-- End Page Title -->
+<section class="pt-0">
+    <div class="container position-relative" data-sticky-container>
+        <div class="row">
+            <!-- Main Content START -->
+            <div class="col-lg-9 mb-5">
+                <!-- Post Content -->
+                <p><span class="dropcap bg-dark text-white px-2">{{ post.content|slice:":1" }}</span>{{ post.content|safe }}</p>
 
-<!-- Blog Details Section -->
-<section id="blog-details" class="blog-details section">
-  <div class="container" data-aos="fade-up">
-
-    <div class="article-hero">
-      <div class="hero-background">
-        {% if post.featured_image %}
-        <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="hero-bg-image">
-        {% else %}
-        <img src="{% static 'assets/img/blog/blog-hero-3.webp' %}" alt="{{ post.title }}" class="hero-bg-image">
-        {% endif %}
-        <div class="hero-overlay"></div>
-      </div>
-
-      <div class="hero-content" data-aos="fade-up" data-aos-delay="200">
-        <div class="category-badges">
-          {% if post.category %}
-          <span class="badge">{{ post.category.name }}</span>
-          {% endif %}
-          {% for tag in post.tags.all|slice:":3" %}
-          <span class="badge">{{ tag.name }}</span>
-          {% endfor %}
-        </div>
-        <h1>{{ post.title }}</h1>
-        <p class="hero-excerpt">{{ post.excerpt|default:post.content|striptags|truncatechars:300 }}</p>
-
-        <div class="author-meta">
-          {% if post.author.profile_picture %}
-          <img src="{{ post.author.profile_picture.url }}" alt="{{ post.author.username }}" class="author-avatar">
-          {% else %}
-          <img src="{% static 'assets/img/person/person-f-8.webp' %}" alt="Author" class="author-avatar">
-          {% endif %}
-          <div class="author-details">
-            <h4>{{ post.author.get_full_name|default:post.author.username }}</h4>
-            <span>{% if post.author.bio %}{{ post.author.bio|truncatechars:50 }}{% else %}Blog Author{% endif %}</span>
-          </div>
-          <div class="article-stats">
-            <span><i class="bi bi-calendar3"></i> {{ post.published_date|date:"F d, Y" }}</span>
-            <span><i class="bi bi-clock-history"></i> {{ post.get_read_time }} min</span>
-            <span><i class="bi bi-chat-dots"></i> {{ comments.count }}</span>
-            <span><i class="bi bi-eye"></i> {{ post.view_count }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="article-body">
-      <div class="sidebar-navigation" data-aos="fade-right">
-        <div class="nav-sticky">
-          <h3><i class="bi bi-list-ul"></i> Contents</h3>
-          <ul class="content-nav">
-            <li><a href="#overview" class="nav-link active">Overview</a></li>
-            <li><a href="#content">Article Content</a></li>
-            <li><a href="#comments">Comments ({{ comments.count }})</a></li>
-            <li><a href="#author">About Author</a></li>
-            {% if related_posts %}
-            <li><a href="#related">Related Posts</a></li>
-            {% endif %}
-          </ul>
-
-          <div class="reading-progress">
-            <div class="progress-bar">
-              <div class="progress-fill"></div>
-            </div>
-            <span class="progress-text">0% Complete</span>
-          </div>
-        </div>
-      </div>
-
-      <main class="main-content">
-        <section id="overview" class="content-block" data-aos="fade-up">
-          <div class="intro-text">
-            <p class="lead-paragraph">
-              {{ post.content|striptags|truncatewords:100 }}
-            </p>
-
-            {{ post.content|safe }}
-          </div>
-        </section>
-
-        <!-- Post Actions -->
-        <section class="content-block" data-aos="fade-up">
-          <div class="article-actions">
-            <div class="engagement-section">
-              <div class="social-sharing">
-                <h3>Share This Article</h3>
-                <div class="share-options">
-                  <a href="#" class="share-btn twitter">
-                    <i class="bi bi-twitter-x"></i>
-                    <span>Twitter</span>
-                  </a>
-                  <a href="#" class="share-btn facebook">
-                    <i class="bi bi-facebook"></i>
-                    <span>Facebook</span>
-                  </a>
-                  <a href="#" class="share-btn linkedin">
-                    <i class="bi bi-linkedin"></i>
-                    <span>LinkedIn</span>
-                  </a>
-                  <a href="#" class="share-btn email">
-                    <i class="bi bi-envelope"></i>
-                    <span>Email</span>
-                  </a>
+                <!-- Post Images -->
+                {% if post.images.all %}
+                <div class="row g-2 my-5">
+                    {% for image in post.images.all %}
+                    <div class="col-md-4">
+                        <a href="{{ image.image.url }}" data-glightbox data-gallery="image-popup">
+                            <img class="rounded" src="{{ image.image.url }}" alt="{{ image.caption|default:post.title }}" style="width: 100%; height: 200px; object-fit: cover;">
+                        </a>
+                    </div>
+                    {% endfor %}
                 </div>
-              </div>
-
-              <div class="article-reactions">
-                <h3>Your Thoughts</h3>
-                <div class="reaction-buttons">
-                  {% if user.is_authenticated %}
-                  <button class="reaction-btn" data-reaction="helpful">
-                    <i class="bi bi-hand-thumbs-up"></i>
-                    <span>Helpful</span>
-                  </button>
-                  <button class="reaction-btn" data-reaction="insightful">
-                    <i class="bi bi-lightbulb"></i>
-                    <span>Insightful</span>
-                  </button>
-                  <a href="#blog-comment-form" class="reaction-btn" style="text-decoration: none;">
-                    <i class="bi bi-chat"></i>
-                    <span>Comment</span>
-                  </a>
-                  {% else %}
-                  <a href="{% url 'login' %}?next={{ request.path }}" class="reaction-btn" style="text-decoration: none;">
-                    <i class="bi bi-box-arrow-in-right"></i>
-                    <span>Login to Engage</span>
-                  </a>
-                  {% endif %}
-                </div>
-              </div>
-            </div>
-
-            <div class="topic-tags">
-              <h3>Related Topics</h3>
-              <div class="tag-cloud">
-                {% if post.category %}
-                <a href="{% url 'category_posts' post.category.slug %}" class="topic-tag">{{ post.category.name }}</a>
                 {% endif %}
-                {% for tag in post.tags.all %}
-                <a href="{% url 'tag_posts' tag.slug %}" class="topic-tag">{{ tag.name }}</a>
-                {% endfor %}
-              </div>
+
+                <!-- Author info START -->
+                <div class="d-flex p-2 p-md-4 my-3 bg-primary bg-opacity-10 rounded">
+                    <!-- Avatar -->
+                    <a href="{% url 'user_profile' post.author.username %}">
+                        <div class="avatar avatar-xxl me-2 me-md-4">
+                            {% if post.author.profile_picture %}
+                            <img class="avatar-img rounded-circle" src="{{ post.author.profile_picture.url }}" alt="{{ post.author.username }}">
+                            {% else %}
+                            <div class="avatar-img rounded-circle bg-primary d-flex align-items-center justify-content-center text-white">
+                                {{ post.author.username|slice:":1"|upper }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </a>
+                    <!-- Info -->
+                    <div>
+                        <div class="d-sm-flex align-items-center justify-content-between">
+                            <div>
+                                <h4 class="m-0"><a href="{% url 'user_profile' post.author.username %}">{{ post.author.get_full_name|default:post.author.username }}</a></h4>
+                                <small>Author</small>
+                            </div>
+                            <a href="{% url 'user_profile' post.author.username %}" class="btn btn-xs btn-primary-soft">View Profile</a>
+                        </div>
+                        <p class="my-2">{{ post.author.bio|default:"This author hasn't added a bio yet." }}</p>
+                        <!-- Social icons -->
+                        <ul class="nav">
+                            {% if post.author.website %}
+                            <li class="nav-item">
+                                <a class="nav-link ps-0 pe-2 fs-5" href="{{ post.author.website }}" target="_blank"><i class="bi bi-globe"></i></a>
+                            </li>
+                            {% endif %}
+                            {% if post.author.twitter %}
+                            <li class="nav-item">
+                                <a class="nav-link px-2 fs-5" href="https://twitter.com/{{ post.author.twitter }}" target="_blank"><i class="bi bi-twitter-x"></i></a>
+                            </li>
+                            {% endif %}
+                            {% if post.author.facebook %}
+                            <li class="nav-item">
+                                <a class="nav-link px-2 fs-5" href="https://facebook.com/{{ post.author.facebook }}" target="_blank"><i class="bi bi-facebook"></i></a>
+                            </li>
+                            {% endif %}
+                            {% if post.author.linkedin %}
+                            <li class="nav-item">
+                                <a class="nav-link px-2 fs-5" href="https://linkedin.com/in/{{ post.author.linkedin }}" target="_blank"><i class="bi bi-linkedin"></i></a>
+                            </li>
+                            {% endif %}
+                        </ul>                   
+                    </div>
+                </div>
+                <!-- Author info END -->
+
+                <!-- Comments START -->
+                <div class="mt-5" id="comments">
+                    <h3>{{ comments.count }} comment{{ comments.count|pluralize }}</h3>
+                    
+                    {% for comment in comments %}
+                        {% if comment.is_parent %}
+                            {% include 'comments/comment_thread.html' with comment=comment %}
+                        {% endif %}
+                    {% empty %}
+                        <div class="alert alert-info">
+                            No comments yet. Be the first to comment!
+                        </div>
+                    {% endfor %}
+                </div>
+                <!-- Comments END -->
+
+                <!-- Reply Form START -->
+                <div class="mt-5" id="comment-form">
+                    <h3>Leave a reply</h3>
+                    <small class="text-muted">Your email address will not be published. Required fields are marked *</small>
+                    
+                    <form method="post" action="{% url 'add_comment' post.id %}" class="row g-3 mt-2" id="commentForm">
+                        {% csrf_token %}
+                        <input type="hidden" name="parent" id="parent_id" value="">
+                        
+                        {% if not user.is_authenticated %}
+                        <div class="col-md-6">
+                            <label class="form-label">Name *</label>
+                            <input type="text" name="name" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Email *</label>
+                            <input type="email" name="email" class="form-control" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Website</label>
+                            <input type="url" name="website" class="form-control" placeholder="https://example.com">
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Save info checkbox -->
+                        <div class="col-md-12">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="save_info" id="saveInfo">
+                                <label class="form-check-label" for="saveInfo">
+                                    Save my name and email in this browser for the next time I comment.
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="col-12">
+                            <label class="form-label">Your Comment *</label>
+                            <textarea name="content" class="form-control" rows="5" required></textarea>
+                        </div>
+                        
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">Post Comment</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- Reply Form END -->
             </div>
-          </div>
-        </section>
-      </main>
-    </div>
+            <!-- Main Content END -->
+            
+            <!-- Right sidebar START -->
+            <div class="col-lg-3">
+                <div data-sticky data-margin-top="80" data-sticky-for="991">
+                    <!-- Categories -->
+                    <div class="row g-2">
+                        <h5>Categories</h5>
+                        {% for category in categories %}
+                        <div class="d-flex justify-content-between align-items-center bg-{{ category.color|default:'primary' }} bg-opacity-10 rounded p-2 position-relative">
+                            <h6 class="m-0 text-{{ category.color|default:'primary' }}">{{ category.name }}</h6>
+                            <a href="{% url 'category_posts' category.slug %}" class="badge bg-{{ category.color|default:'primary' }} stretched-link">
+                                {{ category.post_count }}
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Newsletter START -->
+                    <div class="bg-light p-4 mt-4 rounded-3 text-center">
+                        <h4>Subscribe to our newsletter!</h4>
+                        <form method="post" action="{% url 'newsletter_subscribe' %}">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <input type="email" name="email" class="form-control" placeholder="Email address" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Subscribe</button>
+                            <div class="form-text">We don't spam</div>
+                        </form>
+                    </div>
+                    <!-- Newsletter END -->
 
-  </div>
-</section><!-- /Blog Details Section -->
-
-<!-- Blog Author Section -->
-<section id="blog-author" class="blog-author section">
-  <div class="container" data-aos="fade-up">
-    <div class="author-card">
-      <div class="author-header">
-        <div class="author-image-container">
-          {% if post.author.profile_picture %}
-          <img src="{{ post.author.profile_picture.url }}" class="author-image" alt="{{ post.author.username }}" loading="lazy">
-          {% else %}
-          <img src="{% static 'assets/img/person/person-m-6.webp' %}" class="author-image" alt="" loading="lazy">
-          {% endif %}
-          <div class="expertise-tags">
-            {% if post.author.bio %}
-            <span>{{ post.author.bio|truncatechars:15 }}</span>
-            {% endif %}
-            <span>Blog Author</span>
-          </div>
-        </div>
-
-        <div class="author-intro">
-          <div class="name-block">
-            <h3 class="author-name">{{ post.author.get_full_name|default:post.author.username }}</h3>
-            {% if post.author.is_staff %}
-            <span class="verified-badge">
-              <i class="bi bi-patch-check-fill"></i>
-              Featured Author
-            </span>
-            {% endif %}
-          </div>
-
-          <p class="author-tagline">
-            {% if post.author.bio %}
-            {{ post.author.bio|truncatechars:100 }}
-            {% else %}
-            Sharing knowledge and insights through engaging blog content
-            {% endif %}
-          </p>
-        </div>
-      </div>
-
-      <div class="author-content" data-aos="fade-up" data-aos-delay="200">
-        <div class="content-row">
-          <div class="bio-section">
-            <p class="bio-text">
-              {% if post.author.bio %}
-              {{ post.author.bio }}
-              {% else %}
-              An enthusiastic writer passionate about sharing knowledge and insights. With a focus on creating valuable content that informs and inspires readers.
-              {% endif %}
-            </p>
-            <div class="author-metrics">
-              <div class="metric">
-                <i class="bi bi-pencil-square"></i>
-                <span>{{ post.author.blog_posts.count }} Posts</span>
-              </div>
-              <div class="metric">
-                <i class="bi bi-calendar"></i>
-                <span>Member since {{ post.author.date_joined|date:"M Y" }}</span>
-              </div>
+                    <!-- Popular Posts -->
+                    <div class="mt-4">
+                        <h5>Popular Posts</h5>
+                        {% for popular_post in popular_posts %}
+                        <div class="d-flex align-items-center mb-3">
+                            {% if popular_post.featured_image %}
+                            <img src="{{ popular_post.featured_image.url }}" class="rounded me-3" style="width: 60px; height: 60px; object-fit: cover;" alt="{{ popular_post.title }}">
+                            {% endif %}
+                            <div>
+                                <h6 class="mb-0"><a href="{{ popular_post.get_absolute_url }}">{{ popular_post.title|truncatechars:30 }}</a></h6>
+                                <small class="text-muted">{{ popular_post.view_count }} views</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
-          </div>
-
-          <div class="featured-posts">
-            <h4>Latest Articles</h4>
-            <ul class="post-list">
-              {% for author_post in author_posts %}
-              <li>
-                <i class="bi bi-arrow-right-circle"></i>
-                <span><a href="{{ author_post.get_absolute_url }}" style="color: inherit; text-decoration: none;">{{ author_post.title|truncatechars:40 }}</a></span>
-              </li>
-              {% empty %}
-              <li>No other articles yet</li>
-              {% endfor %}
-            </ul>
-          </div>
+            <!-- Right sidebar END -->
         </div>
-
-        <div class="author-footer">
-          <div class="connect-links">
-            {% if post.author.website %}
-            <a href="{{ post.author.website }}" class="social-link" target="_blank">
-              <i class="bi bi-globe2"></i>
-              <span>Website</span>
-            </a>
-            {% endif %}
-            {% if post.author.twitter %}
-            <a href="https://twitter.com/{{ post.author.twitter }}" class="social-link" target="_blank">
-              <i class="bi bi-twitter-x"></i>
-              <span>@{{ post.author.twitter }}</span>
-            </a>
-            {% endif %}
-            {% if post.author.linkedin %}
-            <a href="https://linkedin.com/in/{{ post.author.linkedin }}" class="social-link" target="_blank">
-              <i class="bi bi-linkedin"></i>
-              <span>LinkedIn</span>
-            </a>
-            {% endif %}
-          </div>
-          <a href="{% url 'user_profile' post.author.username %}" class="subscribe-button">
-            View Full Profile
-            <i class="bi bi-person-circle"></i>
-          </a>
-        </div>
-      </div>
     </div>
-  </div>
-</section><!-- /Blog Author Section -->
-
-<!-- Related Posts Section -->
-{% if related_posts %}
-<section id="related-posts" class="section">
-  <div class="container" data-aos="fade-up">
-    <div class="section-title text-center">
-      <h2>Related Posts</h2>
-      <p>You might also be interested in these articles</p>
-    </div>
-
-    <div class="row">
-      {% for related_post in related_posts %}
-      <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="{{ forloop.counter }}00">
-        <article class="card-post h-100">
-          <div class="post-img position-relative overflow-hidden">
-            {% if related_post.featured_image %}
-            <img src="{{ related_post.featured_image.url }}" class="img-fluid w-100" alt="{{ related_post.title }}" loading="lazy" style="height: 200px; object-fit: cover;">
-            {% else %}
-            <img src="{% static 'assets/img/blog/blog-post-2.webp' %}" class="img-fluid w-100" alt="{{ related_post.title }}" loading="lazy">
-            {% endif %}
-          </div>
-          <div class="content">
-            <div class="meta d-flex align-items-center flex-wrap gap-2">
-              {% if related_post.category %}
-              <span class="cat-badge">{{ related_post.category.name }}</span>
-              {% endif %}
-              <div class="d-flex align-items-center ms-auto">
-                <i class="bi bi-person"></i><span class="ps-2">{{ related_post.author.username|truncatechars:15 }}</span>
-              </div>
-            </div>
-            <h3 class="title">{{ related_post.title|truncatechars:60 }}</h3>
-            <a href="{{ related_post.get_absolute_url }}" class="readmore"><span>Read More</span><i class="bi bi-arrow-right"></i></a>
-          </div>
-        </article>
-      </div>
-      {% endfor %}
-    </div>
-  </div>
 </section>
-{% endif %}
-
-<!-- Blog Comments Section -->
-<section id="blog-comments" class="blog-comments section">
-  <div class="container" data-aos="fade-up" data-aos-delay="100">
-    <div class="blog-comments-4">
-      <div class="comments-header">
-        <h3 class="title">Community Feedback</h3>
-        <div class="comments-stats">
-          <span class="count">{{ comments.count }}</span>
-          <span class="label">Comments</span>
-        </div>
-      </div>
-
-      <div class="comments-container">
-        {% for comment in comments %}
-        <div class="comment-thread">
-          <div class="comment-box">
-            <div class="comment-wrapper">
-              <div class="avatar-wrapper">
-                {% if comment.author and comment.author.profile_picture %}
-                <img src="{{ comment.author.profile_picture.url }}" alt="{{ comment.author.username }}" loading="lazy">
-                {% else %}
-                <img src="{% static 'assets/img/person/person-f-9.webp' %}" alt="Avatar" loading="lazy">
-                {% endif %}
-                <span class="status-indicator"></span>
-              </div>
-
-              <div class="comment-content">
-                <div class="comment-header">
-                  <div class="user-info">
-                    <h4>{% if comment.author %}{{ comment.author.username }}{% else %}{{ comment.name|default:"Anonymous" }}{% endif %}</h4>
-                    <span class="time-badge">
-                      <i class="bi bi-clock"></i>
-                      {{ comment.created_at|timesince }} ago
-                    </span>
-                  </div>
-                  <div class="engagement">
-                    <span class="likes">
-                      <i class="bi bi-heart"></i>
-                      0
-                    </span>
-                  </div>
-                </div>
-
-                <div class="comment-body">
-                  <p>{{ comment.content|linebreaks }}</p>
-                </div>
-
-                <div class="comment-actions">
-                  {% if user.is_authenticated %}
-                  <button class="action-btn like-btn" aria-label="Like comment">
-                    <i class="bi bi-heart"></i>
-                    <span>Like</span>
-                  </button>
-                  {% endif %}
-                  {% if user == comment.author or user.is_staff %}
-                  <a href="{% url 'comment_delete' comment.pk %}" class="action-btn delete-btn" onclick="return confirm('Are you sure you want to delete this comment?');">
-                    <i class="bi bi-trash"></i>
-                    <span>Delete</span>
-                  </a>
-                  {% endif %}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        {% empty %}
-        <div class="text-center py-5">
-          <h4>No comments yet.</h4>
-          <p>Be the first to share your thoughts!</p>
-        </div>
-        {% endfor %}
-      </div>
-    </div>
-  </div>
-</section><!-- /Blog Comments Section -->
-
-<!-- Blog Comment Form Section -->
-<section id="blog-comment-form" class="blog-comment-form section">
-  <div class="container" data-aos="fade-up" data-aos-delay="100">
-    {% if user.is_authenticated %}
-    <form method="post" role="form">
-      {% csrf_token %}
-      
-      <div class="section-header">
-        <h3>Share Your Thoughts</h3>
-        <p>Posting as <strong>{{ user.username }}</strong></p>
-      </div>
-
-      <div class="row gy-3">
-        <div class="col-12 form-group">
-          {{ comment_form.content|as_crispy_field }}
-        </div>
-
-        <div class="col-12 text-center">
-          <button type="submit" class="btn-submit">Post Comment</button>
-        </div>
-      </div>
-    </form>
-    {% else %}
-    <div class="section-header text-center">
-      <h3>Join the Conversation</h3>
-      <p>You need to be logged in to post a comment.</p>
-      <div class="mt-4">
-        <a href="{% url 'login' %}?next={{ request.path }}" class="btn-submit me-3">Login</a>
-        <a href="{% url 'register' %}" class="btn btn-outline-primary">Register</a>
-      </div>
-    </div>
-    {% endif %}
-  </div>
-</section><!-- /Blog Comment Form Section -->
 {% endblock %}
 
 {% block extra_js %}
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Reading Progress
-    function updateReadingProgress() {
-      const articleHeight = document.querySelector('.main-content').offsetHeight;
-      const windowHeight = window.innerHeight;
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      const articleTop = document.querySelector('.main-content').offsetTop;
-      const articleBottom = articleTop + articleHeight;
-      const progress = ((scrollTop + windowHeight - articleTop) / articleHeight) * 100;
-      
-      const progressFill = document.querySelector('.progress-fill');
-      const progressText = document.querySelector('.progress-text');
-      
-      if (scrollTop + windowHeight > articleTop && scrollTop < articleBottom) {
-        const percent = Math.min(100, Math.max(0, progress));
-        progressFill.style.width = percent + '%';
-        progressText.textContent = Math.round(percent) + '% Complete';
-      }
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle reply buttons
+    document.querySelectorAll('.reply-btn').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const commentId = this.dataset.commentId;
+            const authorName = this.dataset.author;
+            const replyForm = document.querySelector('#reply-form-' + commentId);
+            
+            if (replyForm) {
+                replyForm.classList.toggle('d-none');
+                replyForm.querySelector('input[name="parent"]').value = commentId;
+                replyForm.querySelector('textarea').focus();
+            }
+        });
+    });
+    
+    // Handle cancel reply
+    document.querySelectorAll('.cancel-reply').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const replyForm = this.closest('.reply-form');
+            if (replyForm) {
+                replyForm.classList.add('d-none');
+                replyForm.querySelector('textarea').value = '';
+            }
+        });
+    });
+    
+    // Handle comment voting (AJAX)
+    document.querySelectorAll('.vote-btn').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const commentId = this.dataset.commentId;
+            const voteType = this.dataset.vote;
+            
+            fetch(`/comments/${commentId}/vote/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `vote=${voteType}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const upvoteBtn = document.querySelector(`.vote-btn[data-comment-id="${commentId}"][data-vote="1"]`);
+                    const downvoteBtn = document.querySelector(`.vote-btn[data-comment-id="${commentId}"][data-vote="-1"]`);
+                    const scoreSpan = document.querySelector(`#score-${commentId}`);
+                    
+                    upvoteBtn.querySelector('.count').textContent = data.upvotes;
+                    downvoteBtn.querySelector('.count').textContent = data.downvotes;
+                    
+                    if (scoreSpan) {
+                        scoreSpan.textContent = data.score;
+                    }
+                    
+                    // Update active state
+                    if (data.user_vote === 1) {
+                        upvoteBtn.classList.add('active');
+                        downvoteBtn.classList.remove('active');
+                    } else if (data.user_vote === -1) {
+                        upvoteBtn.classList.remove('active');
+                        downvoteBtn.classList.add('active');
+                    } else {
+                        upvoteBtn.classList.remove('active');
+                        downvoteBtn.classList.remove('active');
+                    }
+                }
+            });
+        });
+    });
+    
+    // Handle AJAX comment submission
+    const commentForm = document.getElementById('commentForm');
+    if (commentForm) {
+        commentForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Add comment to the list
+                    const commentsList = document.querySelector('#comments');
+                    const newComment = createCommentElement(data.comment);
+                    commentsList.insertAdjacentHTML('beforeend', newComment);
+                    
+                    // Clear form
+                    this.reset();
+                    
+                    // Show success message
+                    showNotification('Comment posted successfully!', 'success');
+                } else {
+                    // Show errors
+                    let errorMessage = '';
+                    for (let field in data.errors) {
+                        errorMessage += `${field}: ${data.errors[field].join(', ')}\n`;
+                    }
+                    showNotification(errorMessage, 'error');
+                }
+            });
+        });
     }
     
-    window.addEventListener('scroll', updateReadingProgress);
-    updateReadingProgress();
-    
-    // Smooth scroll for navigation links
-    document.querySelectorAll('.content-nav .nav-link').forEach(link => {
-      link.addEventListener('click', function(e) {
-        e.preventDefault();
-        const targetId = this.getAttribute('href');
-        const targetElement = document.querySelector(targetId);
-        if (targetElement) {
-          window.scrollTo({
-            top: targetElement.offsetTop - 100,
-            behavior: 'smooth'
-          });
-        }
-      });
-    });
-    
-    // Update active nav link on scroll
-    const sections = document.querySelectorAll('.content-block');
-    const navLinks = document.querySelectorAll('.content-nav .nav-link');
-    
-    function updateActiveNavLink() {
-      let current = '';
-      const scrollPos = window.scrollY + 150;
-      
-      sections.forEach(section => {
-        const sectionTop = section.offsetTop;
-        const sectionHeight = section.clientHeight;
-        
-        if (scrollPos >= sectionTop && scrollPos < sectionTop + sectionHeight) {
-          current = section.getAttribute('id');
-        }
-      });
-      
-      navLinks.forEach(link => {
-        link.classList.remove('active');
-        if (link.getAttribute('href') === '#' + current) {
-          link.classList.add('active');
-        }
-      });
+    // Helper function to create comment HTML
+    function createCommentElement(comment) {
+        return `
+            <div class="my-4 d-flex" id="comment-${comment.id}">
+                <img class="avatar avatar-md rounded-circle float-start me-3" 
+                     src="${comment.avatar || '/static/assets/images/avatar/default.jpg'}" 
+                     alt="${comment.author}">
+                <div>
+                    <div class="mb-2">
+                        <h5 class="m-0">${comment.author}</h5>
+                        <span class="me-3 small">${comment.created_at}</span>
+                        <a href="#" class="text-body fw-normal reply-btn" 
+                           data-comment-id="${comment.id}" 
+                           data-author="${comment.author}">Reply</a>
+                    </div>
+                    <p>${comment.content}</p>
+                </div>
+            </div>
+        `;
     }
     
-    window.addEventListener('scroll', updateActiveNavLink);
-    updateActiveNavLink();
-    
-    // Initialize AOS
-    AOS.init({
-      duration: 800,
-      once: true,
-      offset: 100
-    });
-    
-    // Handle reaction buttons
-    document.querySelectorAll('.reaction-btn').forEach(button => {
-      button.addEventListener('click', function() {
-        if (!this.classList.contains('active')) {
-          this.classList.add('active');
-          const countElement = this.querySelector('.count');
-          if (countElement) {
-            let count = parseInt(countElement.textContent) || 0;
-            countElement.textContent = count + 1;
-          }
-        }
-      });
-    });
-    
-    // Share functionality
-    document.querySelectorAll('.share-btn').forEach(button => {
-      button.addEventListener('click', function(e) {
-        e.preventDefault();
-        const url = window.location.href;
-        const title = document.title;
-        const platform = this.classList.contains('twitter') ? 'twitter' :
-                       this.classList.contains('facebook') ? 'facebook' :
-                       this.classList.contains('linkedin') ? 'linkedin' : 'email';
+    // Helper function to show notifications
+    function showNotification(message, type) {
+        const notification = document.createElement('div');
+        notification.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show`;
+        notification.setAttribute('role', 'alert');
+        notification.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
         
-        let shareUrl;
-        switch (platform) {
-          case 'twitter':
-            shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`;
-            break;
-          case 'facebook':
-            shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
-            break;
-          case 'linkedin':
-            shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
-            break;
-          case 'email':
-            shareUrl = `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(url)}`;
-            break;
-        }
+        const container = document.querySelector('.container');
+        container.insertBefore(notification, container.firstChild);
         
-        window.open(shareUrl, '_blank', 'width=600,height=400');
-      });
-    });
-  });
+        setTimeout(() => {
+            notification.remove();
+        }, 5000);
+    }
+});
 </script>
 {% endblock %}

@@ -5,6 +5,9 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 from .forms import ProfileUpdateForm
 from .models import CustomUser
+from django.contrib.auth import get_user_model
+from posts.models import Post
+from django.db.models import Count, Q
 
 @login_required
 def profile(request):
@@ -49,3 +52,15 @@ def register(request):
     else:
         form = CustomUserCreationForm()
     return render(request, 'registration/register.html', {'form': form})
+
+User = get_user_model()
+
+def author_list(request):
+    """List all authors with their post counts"""
+    authors = User.objects.annotate(
+        post_count=Count('blog_posts', filter=Q(blog_posts__status='published'))
+    ).filter(post_count__gt=0).order_by('-post_count')
+    
+    return render(request, 'users/author_list.html', {
+        'authors': authors
+    })

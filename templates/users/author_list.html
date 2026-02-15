@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Our Authors{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center mb-5">
+                <h1 class="display-5">Our Authors</h1>
+                <p class="lead">Meet the talented writers behind our stories</p>
+            </div>
+        </div>
+        <div class="row g-4">
+            {% for author in authors %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 text-center p-4">
+                    <div class="avatar avatar-xxl mx-auto mb-4">
+                        {% if author.profile_picture %}
+                        <img class="avatar-img rounded-circle" src="{{ author.profile_picture.url }}" alt="{{ author.username }}">
+                        {% else %}
+                        <div class="avatar-img rounded-circle bg-primary d-flex align-items-center justify-content-center text-white" style="font-size: 2.5rem;">
+                            {{ author.username|slice:":2"|upper }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <h4><a href="{% url 'user_profile' author.username %}" class="text-reset">{{ author.get_full_name|default:author.username }}</a></h4>
+                    <p class="text-muted">{{ author.bio|default:"This author hasn't added a bio yet."|truncatechars:100 }}</p>
+                    <div class="d-flex justify-content-center gap-2 mb-3">
+                        <span class="badge bg-primary">{{ author.post_count }} Post{{ author.post_count|pluralize }}</span>
+                        {% if author.is_staff %}
+                        <span class="badge bg-success">Staff</span>
+                        {% endif %}
+                    </div>
+                    <div class="mt-auto">
+                        <a href="{% url 'user_profile' author.username %}" class="btn btn-outline-primary btn-sm">View Profile</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

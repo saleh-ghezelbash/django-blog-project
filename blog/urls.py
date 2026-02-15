@@ -8,6 +8,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 from users.forms import CustomUserCreationForm
 from users.views import register
+from django.views.generic import TemplateView
+from users.views import register, author_list
 
 urlpatterns = [
     # Admin
@@ -28,6 +30,10 @@ urlpatterns = [
     path('tags/', include('tags.urls')),
     path('comments/', include('comments.urls')),
     path('users/', include('users.urls')),
+
+    path('newsletter/', include('newsletter.urls')),
+    path('about/', TemplateView.as_view(template_name='about.html'), name='about'),
+    path('author/list/', author_list, name='author_list'),
     
     # CKEditor
     path('ckeditor/', include('ckeditor_uploader.urls')),
