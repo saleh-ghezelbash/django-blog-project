@@ -7,7 +7,7 @@ from .forms import ProfileUpdateForm
 from .models import CustomUser
 from django.contrib.auth import get_user_model
 from posts.models import Post
-from django.db.models import Count
+from django.db.models import Count, Q
 
 @login_required
 def profile(request):

@@ -8,6 +8,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 from users.forms import CustomUserCreationForm
 from users.views import register
+from django.views.generic import TemplateView
+from users.views import register, author_list
 
 urlpatterns = [
     # Admin

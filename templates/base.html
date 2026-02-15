@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -137,7 +138,6 @@ Header START -->
 						<a class="nav-link dropdown-toggle" href="#" id="pagesMenu" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Pages</a>
 						<ul class="dropdown-menu" aria-labelledby="pagesMenu">
 							<li> <a class="dropdown-item" href="{% url 'about' %}">About</a></li>
-							<li> <a class="dropdown-item" href="{% url 'contact' %}">Contact</a></li>
 							<li> <a class="dropdown-item" href="{% url 'tag_list' %}">Tags</a></li>
 							<li> <a class="dropdown-item" href="{% url 'author_list' %}">Authors</a></li>
 						</ul>
@@ -152,7 +152,6 @@ Header START -->
 						<ul class="dropdown-menu" aria-labelledby="userMenu">
 							<li> <a class="dropdown-item" href="{% url 'profile' %}">Profile</a></li>
 							<li> <a class="dropdown-item" href="{% url 'post_create' %}">Create Post</a></li>
-							<li> <a class="dropdown-item" href="{% url 'dashboard' %}">Dashboard</a></li>
 							<li class="dropdown-divider"></li>
 							<li> <a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
 						</ul>
@@ -215,7 +214,6 @@ Header START -->
 						<li><a class="dropdown-item fw-normal" href="#">Newsletter</a></li>
 						<li><a class="dropdown-item fw-normal" href="{% url 'author_list' %}">Authors</a></li>
 						<li><a class="dropdown-item fw-normal" href="{% url 'tag_list' %}">#Tags</a></li>
-						<li><a class="dropdown-item fw-normal" href="{% url 'contact' %}">Contact</a></li>
 						{% if user.is_staff %}
 						<li><a class="dropdown-item fw-normal" href="/admin/"><span class="badge bg-danger me-2 align-middle">Admin</span>Admin Panel</a></li>
 						{% endif %}
@@ -288,7 +286,6 @@ Footer START -->
 						<ul class="nav flex-column">
 							<li class="nav-item"><a class="nav-link pt-0" href="{% url 'home' %}">Home</a></li>
 							<li class="nav-item"><a class="nav-link" href="{% url 'about' %}">About</a></li>
-							<li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Contact us</a></li>
 							<li class="nav-item"><a class="nav-link" href="{% url 'category_list' %}">Categories</a></li>
 						</ul>
 					</div>
@@ -296,7 +293,6 @@ Footer START -->
 						<ul class="nav flex-column">
 							<li class="nav-item"><a class="nav-link pt-0" href="{% url 'post_list' %}">News</a></li>
 							{% if user.is_authenticated %}
-							<li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a></li>
 							{% endif %}
 							<li class="nav-item"><a class="nav-link" href="{% url 'tag_list' %}">Tags</a></li>
 							<li class="nav-item"><a class="nav-link" href="{% url 'author_list' %}">Authors</a></li>
