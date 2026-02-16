@@ -11,6 +11,10 @@ from comments.models import Comment
 from taggit.models import Tag
 from newsletter.models import Subscriber
 
+
+
+
+
 def home(request):
     """Home page view with all sections"""
     
@@ -209,23 +213,95 @@ def post_delete(request, pk):
     
     return render(request, 'posts/post_confirm_delete.html', {'post': post})
 
+
 def search(request):
-    query = request.GET.get('q')
-    results = []
+    """Advanced search functionality"""
+    query = request.GET.get('q', '')
+    category_slug = request.GET.get('category', '')
+    tag_slug = request.GET.get('tag', '')
+    author = request.GET.get('author', '')
+    date_from = request.GET.get('date_from', '')
+    date_to = request.GET.get('date_to', '')
     
+    # Base queryset
+    results = Post.objects.filter(status='published')
+    
+    # Apply filters
     if query:
-        results = Post.objects.filter(
+        results = results.filter(
             Q(title__icontains=query) |
             Q(content__icontains=query) |
             Q(excerpt__icontains=query) |
-            Q(tags__name__icontains=query),
-            status='published'
-        ).distinct().order_by('-published_date')
+            Q(tags__name__icontains=query)
+        ).distinct()
     
-    return render(request, 'posts/search_results.html', {
+    if category_slug:
+        results = results.filter(category__slug=category_slug)
+    
+    if tag_slug:
+        results = results.filter(tags__slug=tag_slug)
+    
+    if author:
+        results = results.filter(
+            Q(author__username__icontains=author) |
+            Q(author__first_name__icontains=author) |
+            Q(author__last_name__icontains=author)
+        )
+    
+    if date_from:
+        results = results.filter(published_date__gte=date_from)
+    
+    if date_to:
+        results = results.filter(published_date__lte=date_to)
+    
+    # Order by relevance (if query exists) or date
+    if query:
+        # Simple relevance sorting - posts with title matches first
+        results = results.extra(
+            select={'relevance': 'CASE WHEN title LIKE %s THEN 2 ELSE 1 END' % f'%{query}%'}
+        ).order_by('-relevance', '-published_date')
+    else:
+        results = results.order_by('-published_date')
+    
+    # Pagination
+    paginator = Paginator(results, 10)  # 10 results per page
+    page = request.GET.get('page')
+    results_page = paginator.get_page(page)
+    
+    # Get trending categories
+    trending_categories = Category.objects.annotate(
+        post_count=Count('posts', filter=Q(posts__status='published'))
+    ).filter(post_count__gt=0).order_by('-post_count')[:8]
+    
+    # Get recent posts
+    recent_posts = Post.objects.filter(
+        status='published'
+    ).order_by('-published_date')[:10]
+    
+    # Get popular tags
+    popular_tags = Tag.objects.annotate(
+        post_count=Count('taggit_taggeditem_items')
+    ).order_by('-post_count')[:15]
+    
+    context = {
         'query': query,
-        'results': results
-    })
+        'results': results_page,
+        'paginator': paginator,
+        'trending_categories': trending_categories,
+        'recent_posts': recent_posts,
+        'popular_tags': popular_tags,
+        'category_slug': category_slug,
+        'tag_slug': tag_slug,
+        'author': author,
+        'date_from': date_from,
+        'date_to': date_to,
+    }
+    
+    return render(request, 'search/search_results.html', context)
+
+def advanced_search(request):
+    """Advanced search with more filters"""
+    return render(request, 'search/advanced_search.html')
 
 def newsletter_subscribe(request):
     """Handle newsletter subscription"""

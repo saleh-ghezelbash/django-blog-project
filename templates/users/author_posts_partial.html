@@ -1,0 +1,68 @@
+{% for post in posts %}
+<!-- Card item START -->
+<div class="col-sm-6 col-lg-4">
+  <div class="card h-100">
+    <!-- Card img -->
+    <div class="position-relative">
+      {% if post.featured_image %}
+      <img class="card-img" src="{{ post.featured_image.url }}" alt="{{ post.title }}" style="height: 200px; object-fit: cover;">
+      {% else %}
+      <img class="card-img" src="{% static 'assets/images/blog/4by3/14.jpg' %}" alt="{{ post.title }}" style="height: 200px; object-fit: cover;">
+      {% endif %}
+      <div class="card-img-overlay d-flex align-items-start flex-column p-3">
+        <!-- Card overlay Top -->
+        {% if post.get_media_type == 'video' %}
+        <div class="w-100 mb-auto d-flex justify-content-end">
+          <div class="text-end ms-auto">
+            <div class="icon-md bg-white bg-opacity-25 bg-blur text-white rounded-circle" title="This post has video">
+              <i class="fas fa-video"></i>
+            </div>
+          </div>
+        </div>
+        {% elif post.get_media_type == 'audio' %}
+        <div class="w-100 mb-auto d-flex justify-content-end">
+          <div class="text-end ms-auto">
+            <div class="icon-md bg-white bg-opacity-25 bg-blur text-white rounded-circle" title="This post has audio">
+              <i class="fas fa-volume-up"></i>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        <!-- Card overlay bottom -->
+        <div class="w-100 mt-auto">
+          <!-- Card category -->
+          {% if post.category %}
+          <a href="{% url 'category_posts' post.category.slug %}" class="badge {% cycle 'text-bg-warning' 'text-bg-danger' 'text-bg-success' 'bg-primary' 'text-bg-info' %} mb-2">
+            <i class="fas fa-circle me-2 small fw-bold"></i>{{ post.category.name }}
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="card-body px-0 pt-3">
+      <h4 class="card-title">
+        <a href="{{ post.get_absolute_url }}" class="btn-link text-reset fw-bold">{{ post.title|truncatechars:50 }}</a>
+      </h4>
+      <p class="card-text">{{ post.excerpt|default:post.content|striptags|truncatechars:100 }}</p>
+      <!-- Card info -->
+      <ul class="nav nav-divider align-items-center small">
+        <li class="nav-item">
+          <div class="nav-link">
+            <div class="d-flex align-items-center">
+              <i class="bi bi-calendar3 me-1"></i>
+              <span>{{ post.published_date|date:"M d, Y" }}</span>
+            </div>
+          </div>
+        </li>
+        <li class="nav-item">
+          <i class="bi bi-eye me-1"></i> {{ post.views_count }}
+        </li>
+        <li class="nav-item">
+          <i class="bi bi-chat me-1"></i> {{ post.comments.count }}
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+<!-- Card item END -->
+{% endfor %}

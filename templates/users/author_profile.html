@@ -1,0 +1,472 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ author_display_name }} - Author Profile{% endblock %}
+{% block description %}Read articles by {{ author_display_name }}. {{ author.bio|truncatechars:160 }}{% endblock %}
+
+{% block content %}
+
+<!-- =======================
+Inner intro START -->
+<section class="pt-4">
+	<div class="container">
+		<div class="row">
+      <div class="col-12">
+        <!-- Author info START -->
+				<div class="bg-primary bg-opacity-10 d-md-flex p-3 p-sm-4 my-3 text-center text-md-start rounded">
+					<!-- Avatar -->
+          <div class="me-0 me-md-4 position-relative">
+            <div class="avatar avatar-xxl">
+              {% if author.profile_picture %}
+              <img class="avatar-img rounded-circle" src="{{ author.profile_picture.url }}" alt="{{ author.username }}">
+              {% else %}
+              <div class="avatar-img rounded-circle bg-primary d-flex align-items-center justify-content-center text-white" style="font-size: 3rem;">
+                {{ author.username|slice:":2"|upper }}
+              </div>
+              {% endif %}
+            </div>
+            <!-- Post count -->
+            <div class="text-center mt-n3 position-relative">
+              <span class="badge bg-danger fs-6">{{ total_posts }} post{{ total_posts|pluralize }}</span>
+            </div>
+            <!-- Verified badge for staff -->
+            {% if author.is_staff %}
+            <div class="position-absolute top-0 end-0">
+              <span class="badge bg-success rounded-pill">
+                <i class="bi bi-patch-check-fill me-1"></i>Verified
+              </span>
+            </div>
+            {% endif %}
+          </div>
+					<!-- Info -->
+					<div class="flex-grow-1">
+            <h2 class="m-0">{{ author_display_name }}</h2>
+            <ul class="list-inline">
+              {% if author.title %}
+              <li class="list-inline-item"><i class="bi bi-briefcase-fill me-1"></i> {{ author.title }}</li>
+              {% endif %}
+              {% if author.location %}
+              <li class="list-inline-item"><i class="bi bi-geo-alt-fill me-1"></i> {{ author.location }}</li>
+              {% endif %}
+              <li class="list-inline-item"><i class="bi bi-calendar3 me-1"></i> Joined {{ author.date_joined|date:"F Y" }}</li>
+            </ul>
+						<p class="my-2">{{ author.bio|default:"This author hasn't added a bio yet." }}</p>
+						
+            <!-- Author stats -->
+            <div class="d-flex gap-4 my-3">
+              <div class="text-center">
+                <h4 class="mb-0">{{ total_posts }}</h4>
+                <small class="text-muted">Posts</small>
+              </div>
+              <div class="text-center">
+                <h4 class="mb-0">{{ total_views }}</h4>
+                <small class="text-muted">Total Views</small>
+              </div>
+              <div class="text-center">
+                <h4 class="mb-0">{{ total_comments }}</h4>
+                <small class="text-muted">Comments</small>
+              </div>
+              <div class="text-center">
+                <h4 class="mb-0 follower-count">{{ follower_count }}</h4>
+                <small class="text-muted">Followers</small>
+              </div>
+            </div>
+            
+            <!-- Follow/Subscribe buttons -->
+            <div class="d-flex gap-2 mb-3">
+              {% if user.is_authenticated and user != author %}
+                {% if is_following %}
+                <button class="btn btn-outline-danger btn-sm follow-btn" data-author-id="{{ author.id }}">
+                  <i class="bi bi-person-dash-fill me-1"></i>Unfollow
+                </button>
+                {% else %}
+                <button class="btn btn-primary btn-sm follow-btn" data-author-id="{{ author.id }}">
+                  <i class="bi bi-person-plus-fill me-1"></i>Follow
+                </button>
+                {% endif %}
+              {% endif %}
+              
+              {% if user == author %}
+              <a href="{% url 'profile' %}" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-pencil-square me-1"></i>Edit Profile
+              </a>
+              <a href="{% url 'post_create' %}" class="btn btn-success btn-sm">
+                <i class="bi bi-plus-circle me-1"></i>New Post
+              </a>
+              {% endif %}
+            </div>
+            
+            <!-- Social icons -->
+            <ul class="nav justify-content-center justify-content-md-start">
+              {% if author.website %}
+              <li class="nav-item">
+                <a class="nav-link ps-0 pe-2 fs-5" href="{{ author.website }}" target="_blank" title="Website">
+                  <i class="fas fa-globe"></i>
+                </a>
+              </li>
+              {% endif %}
+              {% if author.facebook %}
+              <li class="nav-item">
+                <a class="nav-link px-2 fs-5" href="https://facebook.com/{{ author.facebook }}" target="_blank" title="Facebook">
+                  <i class="fab fa-facebook-square"></i>
+                </a>
+              </li>
+              {% endif %}
+              {% if author.twitter %}
+              <li class="nav-item">
+                <a class="nav-link px-2 fs-5" href="https://twitter.com/{{ author.twitter }}" target="_blank" title="Twitter">
+                  <i class="fab fa-twitter-square"></i>
+                </a>
+              </li>
+              {% endif %}
+              {% if author.linkedin %}
+              <li class="nav-item">
+                <a class="nav-link px-2 fs-5" href="https://linkedin.com/in/{{ author.linkedin }}" target="_blank" title="LinkedIn">
+                  <i class="fab fa-linkedin"></i>
+                </a>
+              </li>
+              {% endif %}
+              {% if author.instagram %}
+              <li class="nav-item">
+                <a class="nav-link px-2 fs-5" href="https://instagram.com/{{ author.instagram }}" target="_blank" title="Instagram">
+                  <i class="fab fa-instagram-square"></i>
+                </a>
+              </li>
+              {% endif %}
+              {% if author.github %}
+              <li class="nav-item">
+                <a class="nav-link px-2 fs-5" href="https://github.com/{{ author.github }}" target="_blank" title="GitHub">
+                  <i class="fab fa-github-square"></i>
+                </a>
+              </li>
+              {% endif %}
+            </ul>					
+					</div>
+				</div>
+				<!-- Author info END -->
+      </div>
+    </div>
+	</div>
+</section>
+<!-- =======================
+Inner intro END -->
+
+<!-- =======================
+Main content START -->
+<section class="position-relative pt-0">
+	<div class="container">
+		<div class="row">
+      <div class="col-12 mb-3">
+        <div class="d-flex justify-content-between align-items-center">
+          <h2>The Latest from {{ author_display_name }}</h2>
+          {% if posts.has_other_pages %}
+          <div class="dropdown">
+            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-sort-down me-1"></i> Sort by
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item {% if sort == 'newest' %}active{% endif %}" href="?sort=newest">Newest First</a></li>
+              <li><a class="dropdown-item {% if sort == 'oldest' %}active{% endif %}" href="?sort=oldest">Oldest First</a></li>
+              <li><a class="dropdown-item {% if sort == 'popular' %}active{% endif %}" href="?sort=popular">Most Popular</a></li>
+              <li><a class="dropdown-item {% if sort == 'commented' %}active{% endif %}" href="?sort=commented">Most Commented</a></li>
+            </ul>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      
+			<!-- Main Post START -->
+			<div class="col-12">
+        {% if posts %}
+        <div class="row gy-4">
+          {% for post in posts %}
+          <!-- Card item START -->
+          <div class="col-sm-6 col-lg-4">
+            <div class="card h-100">
+              <!-- Card img -->
+              <div class="position-relative">
+                {% if post.featured_image %}
+                <img class="card-img" src="{{ post.featured_image.url }}" alt="{{ post.title }}" style="height: 200px; object-fit: cover;">
+                {% else %}
+                <img class="card-img" src="{% static 'assets/images/blog/4by3/14.jpg' %}" alt="{{ post.title }}" style="height: 200px; object-fit: cover;">
+                {% endif %}
+                <div class="card-img-overlay d-flex align-items-start flex-column p-3">
+                  <!-- Card overlay Top -->
+                  {% if post.get_media_type == 'video' %}
+                  <div class="w-100 mb-auto d-flex justify-content-end">
+                    <div class="text-end ms-auto">
+                      <div class="icon-md bg-white bg-opacity-25 bg-blur text-white rounded-circle" title="This post has video">
+                        <i class="fas fa-video"></i>
+                      </div>
+                    </div>
+                  </div>
+                  {% elif post.get_media_type == 'audio' %}
+                  <div class="w-100 mb-auto d-flex justify-content-end">
+                    <div class="text-end ms-auto">
+                      <div class="icon-md bg-white bg-opacity-25 bg-blur text-white rounded-circle" title="This post has audio">
+                        <i class="fas fa-volume-up"></i>
+                      </div>
+                    </div>
+                  </div>
+                  {% elif post.get_media_type == 'gallery' %}
+                  <div class="w-100 mb-auto d-flex justify-content-end">
+                    <div class="text-end ms-auto">
+                      <div class="icon-md bg-white bg-opacity-25 bg-blur text-white rounded-circle" title="This post has gallery">
+                        <i class="fas fa-images"></i>
+                      </div>
+                    </div>
+                  </div>
+                  {% endif %}
+                  <!-- Card overlay bottom -->
+                  <div class="w-100 mt-auto">
+                    <!-- Card category -->
+                    {% if post.category %}
+                    <a href="{% url 'category_posts' post.category.slug %}" class="badge {% cycle 'text-bg-warning' 'text-bg-danger' 'text-bg-success' 'bg-primary' 'text-bg-info' %} mb-2">
+                      <i class="fas fa-circle me-2 small fw-bold"></i>{{ post.category.name }}
+                    </a>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              <div class="card-body px-0 pt-3">
+                <h4 class="card-title">
+                  <a href="{{ post.get_absolute_url }}" class="btn-link text-reset fw-bold">{{ post.title|truncatechars:50 }}</a>
+                </h4>
+                <p class="card-text">{{ post.excerpt|default:post.content|striptags|truncatechars:100 }}</p>
+                <!-- Card info -->
+                <ul class="nav nav-divider align-items-center small">
+                  <li class="nav-item">
+                    <div class="nav-link">
+                      <div class="d-flex align-items-center">
+                        <i class="bi bi-calendar3 me-1"></i>
+                        <span>{{ post.published_date|date:"M d, Y" }}</span>
+                      </div>
+                    </div>
+                  </li>
+                  <li class="nav-item">
+                    <i class="bi bi-eye me-1"></i> {{ post.views_count }}
+                  </li>
+                  <li class="nav-item">
+                    <i class="bi bi-chat me-1"></i> {{ post.comments.count }}
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <!-- Card item END -->
+          {% endfor %}
+        </div>
+
+        <!-- Pagination START -->
+        {% if posts.has_other_pages %}
+        <nav class="mt-5" aria-label="navigation">
+          <ul class="pagination justify-content-center">
+            {% if posts.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ posts.previous_page_number }}{% if sort %}&sort={{ sort }}{% endif %}">
+                <i class="bi bi-chevron-left"></i> Prev
+              </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+              <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
+                <i class="bi bi-chevron-left"></i> Prev
+              </a>
+            </li>
+            {% endif %}
+
+            {% for num in posts.paginator.page_range %}
+              {% if posts.number == num %}
+              <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+              {% elif num > posts.number|add:'-3' and num < posts.number|add:'3' %}
+              <li class="page-item"><a class="page-link" href="?page={{ num }}{% if sort %}&sort={{ sort }}{% endif %}">{{ num }}</a></li>
+              {% endif %}
+            {% endfor %}
+
+            {% if posts.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ posts.next_page_number }}{% if sort %}&sort={{ sort }}{% endif %}">
+                Next <i class="bi bi-chevron-right"></i>
+              </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+              <a class="page-link" href="#">
+                Next <i class="bi bi-chevron-right"></i>
+              </a>
+            </li>
+            {% endif %}
+          </ul>
+        </nav>
+        {% endif %}
+        <!-- Pagination END -->
+
+        <!-- Load more button (alternative to pagination) -->
+        {% if posts.has_next %}
+        <div class="col-12 text-center mt-5">
+          <a href="?page={{ posts.next_page_number }}{% if sort %}&sort={{ sort }}{% endif %}" class="btn btn-primary-soft">
+            Load more posts <i class="bi bi-arrow-down-circle ms-2 align-middle"></i>
+          </a>
+        </div>
+        {% endif %}
+
+        {% else %}
+        <!-- No posts yet -->
+        <div class="col-12">
+          <div class="card text-center py-5">
+            <div class="card-body">
+              <i class="bi bi-pencil display-1 text-muted mb-3"></i>
+              <h3>No posts yet</h3>
+              <p class="text-muted">This author hasn't published any posts yet.</p>
+              {% if user == author %}
+              <a href="{% url 'post_create' %}" class="btn btn-primary">Create Your First Post</a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% endif %}
+			</div>
+			<!-- Main Post END -->
+      
+      <!-- Author's Popular Posts Sidebar -->
+      {% if popular_posts %}
+      <div class="col-12 mt-5">
+        <div class="row">
+          <div class="col-12 mb-3">
+            <h3>Most Popular by {{ author_display_name }}</h3>
+          </div>
+          {% for post in popular_posts|slice:":3" %}
+          <div class="col-md-4">
+            <div class="card mb-3">
+              <div class="row g-0">
+                <div class="col-4">
+                  {% if post.featured_image %}
+                  <img src="{{ post.featured_image.url }}" class="img-fluid rounded-start" alt="{{ post.title }}" style="height: 100px; width: 100%; object-fit: cover;">
+                  {% else %}
+                  <img src="{% static 'assets/images/blog/4by3/thumb/01.jpg' %}" class="img-fluid rounded-start" alt="{{ post.title }}">
+                  {% endif %}
+                </div>
+                <div class="col-8">
+                  <div class="card-body py-0 px-2">
+                    <h6 class="card-title">
+                      <a href="{{ post.get_absolute_url }}" class="text-reset">{{ post.title|truncatechars:40 }}</a>
+                    </h6>
+                    <p class="card-text">
+                      <small class="text-muted">
+                        <i class="bi bi-eye me-1"></i> {{ post.views_count }} views
+                      </small>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+      
+		</div> <!-- Row end -->
+	</div>
+</section>
+<!-- =======================
+Main content END -->
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Follow/Unfollow functionality
+  const followBtn = document.querySelector('.follow-btn');
+  if (followBtn) {
+    followBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const authorId = this.dataset.authorId;
+      
+      fetch(`/users/follow/${authorId}/`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}',
+          'X-Requested-With': 'XMLHttpRequest',
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          if (data.following) {
+            followBtn.classList.remove('btn-primary');
+            followBtn.classList.add('btn-outline-danger');
+            followBtn.innerHTML = '<i class="bi bi-person-dash-fill me-1"></i>Unfollow';
+          } else {
+            followBtn.classList.remove('btn-outline-danger');
+            followBtn.classList.add('btn-primary');
+            followBtn.innerHTML = '<i class="bi bi-person-plus-fill me-1"></i>Follow';
+          }
+          
+          // Update follower count
+          const followerCount = document.querySelector('.follower-count');
+          if (followerCount) {
+            followerCount.textContent = data.follower_count;
+          }
+          
+          // Show notification
+          showNotification(data.message, 'success');
+        }
+      })
+      .catch(error => {
+        showNotification('An error occurred. Please try again.', 'danger');
+      });
+    });
+  }
+  
+  // Load more posts (AJAX)
+  const loadMoreBtn = document.querySelector('.load-more-btn');
+  if (loadMoreBtn) {
+    loadMoreBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const nextPage = this.dataset.nextPage;
+      const sort = this.dataset.sort;
+      
+      fetch(`?page=${nextPage}&sort=${sort}`, {
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+        }
+      })
+      .then(response => response.text())
+      .then(html => {
+        // Parse the response and append new posts
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const newPosts = doc.querySelector('.row.gy-4').innerHTML;
+        document.querySelector('.row.gy-4').insertAdjacentHTML('beforeend', newPosts);
+        
+        // Update next page
+        const newNextPage = doc.querySelector('.load-more-btn')?.dataset.nextPage;
+        if (newNextPage) {
+          loadMoreBtn.dataset.nextPage = newNextPage;
+        } else {
+          loadMoreBtn.remove();
+        }
+      });
+    });
+  }
+  
+  // Notification helper
+  function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3`;
+    notification.style.zIndex = '9999';
+    notification.innerHTML = `
+      ${message}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+      notification.remove();
+    }, 3000);
+  }
+});
+</script>
+{% endblock %}

@@ -1,45 +1,180 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Our Authors{% endblock %}
+{% block title %}Our Authors - Blogzine{% endblock %}
 
 {% block content %}
-<section class="py-5">
+
+<!-- =======================
+Inner intro START -->
+<section class="pt-4">
     <div class="container">
         <div class="row">
-            <div class="col-12 text-center mb-5">
-                <h1 class="display-5">Our Authors</h1>
-                <p class="lead">Meet the talented writers behind our stories</p>
+            <div class="col-12">
+                <div class="border p-4 text-center rounded-3">
+                    <h1>Our Authors</h1>
+                    <p class="lead mb-2">Meet the talented writers behind our stories</p>
+                    <nav class="d-flex justify-content-center" aria-label="breadcrumb">
+                        <ol class="breadcrumb breadcrumb-dots m-0">
+                            <li class="breadcrumb-item"><a href="{% url 'home' %}"><i class="bi bi-house me-1"></i>
+                                    Home</a></li>
+                            <li class="breadcrumb-item active">Authors</li>
+                        </ol>
+                    </nav>
+                </div>
             </div>
         </div>
+    </div>
+</section>
+<!-- =======================
+Inner intro END -->
+
+<!-- =======================
+Author list START -->
+<section class="pt-0">
+    <div class="container">
+        <!-- Search and Filter -->
+        <div class="row mb-4">
+            <div class="col-md-6 mx-auto">
+                <form class="input-group" method="GET" action="{% url 'author_list' %}">
+                    <input type="text" class="form-control" name="q" placeholder="Search authors..."
+                        value="{{ search_query }}">
+                    <button class="btn btn-primary" type="submit">
+                        <i class="bi bi-search"></i> Search
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="row mb-4">
+            <div class="col-12 text-center">
+                <p class="text-muted"> We have <strong>{{ total_authors }}</strong> active author{{ total_authors|pluralize }}</p>
+            </div>
+        </div>
+
+        <!-- Authors Grid -->
         <div class="row g-4">
             {% for author in authors %}
+            <!-- Author item -->
             <div class="col-md-6 col-lg-4">
                 <div class="card h-100 text-center p-4">
-                    <div class="avatar avatar-xxl mx-auto mb-4">
-                        {% if author.profile_picture %}
-                        <img class="avatar-img rounded-circle" src="{{ author.profile_picture.url }}" alt="{{ author.username }}">
-                        {% else %}
-                        <div class="avatar-img rounded-circle bg-primary d-flex align-items-center justify-content-center text-white" style="font-size: 2.5rem;">
-                            {{ author.username|slice:":2"|upper }}
+                    <div class="position-relative mx-auto" style="width: 120px;">
+                        <div class="avatar avatar-xxl">
+                            {% if author.profile_picture %}
+                            <img class="avatar-img rounded-circle" src="{{ author.profile_picture.url }}"
+                                alt="{{ author.username }}">
+                            {% else %}
+                            <div class="avatar-img rounded-circle bg-primary d-flex align-items-center justify-content-center text-white"
+                                style="font-size: 2.5rem;">
+                                {{ author.username|slice:":2"|upper }}
+                            </div>
+                            {% endif %}
                         </div>
-                        {% endif %}
-                    </div>
-                    <h4><a href="{% url 'user_profile' author.username %}" class="text-reset">{{ author.get_full_name|default:author.username }}</a></h4>
-                    <p class="text-muted">{{ author.bio|default:"This author hasn't added a bio yet."|truncatechars:100 }}</p>
-                    <div class="d-flex justify-content-center gap-2 mb-3">
-                        <span class="badge bg-primary">{{ author.post_count }} Post{{ author.post_count|pluralize }}</span>
                         {% if author.is_staff %}
-                        <span class="badge bg-success">Staff</span>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
+                            <i class="bi bi-patch-check-fill"></i>
+                        </span>
                         {% endif %}
                     </div>
-                    <div class="mt-auto">
-                        <a href="{% url 'user_profile' author.username %}" class="btn btn-outline-primary btn-sm">View Profile</a>
+                    <div class="mt-3">
+                        <h4><a href="{% url 'author_profile' author.username %}" class="text-reset"> {% if author.get_full_name %}{{ author.get_full_name }}{% else %}{{ author.username }}{% endif %}</a></h4>
+                        {% if author.title %}
+                        <p class="text-muted small mb-2">{{ author.title }}</p>
+                        {% endif %}
+                        <p class="text-muted">{{ author.bio|default:""|truncatechars:100 }}</p>
+                    </div>
+
+
+                    <!-- Stats -->
+                    <div class="d-flex justify-content-around mt-3 pt-3 border-top">
+                        <div class="text-center">
+                            <h5 class="mb-0">{{ author.post_count }}</h5>
+                            <small class="text-muted">Posts</small>
+                        </div>
+                        <div class="text-center">
+                            <h5 class="mb-0">{{ author.total_views|default:0 }}</h5>
+                            <small class="text-muted">Views</small>
+                        </div>
+                        <div class="text-center">
+                            <h5 class="mb-0">{{ author.total_comments|default:0 }}</h5>
+                            <small class="text-muted">Comments</small>
+                        </div>
+                    </div>
+
+                    <!-- Action buttons -->
+                    <div class="mt-3 d-flex justify-content-center gap-2">
+                        <a href="{% url 'author_profile' author.username %}" class="btn btn-primary btn-sm">
+                            <i class="bi bi-person-circle me-1"></i> View Profile
+                        </a>
+                        {% if user.is_authenticated and user != author %}
+                        <button class="btn btn-outline-secondary btn-sm follow-btn" data-author-id="{{ author.id }}">
+                            <i class="bi bi-person-plus-fill"></i>
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="card text-center py-5">
+                    <div class="card-body">
+                        <i class="bi bi-people display-1 text-muted mb-3"></i>
+                        <h3>No authors found</h3>
+                        <p class="text-muted">We couldn't find any authors matching your search.</p>
+                        {% if search_query %}
+                        <a href="{% url 'author_list' %}" class="btn btn-primary">Clear Search</a>
+                        {% endif %}
                     </div>
                 </div>
             </div>
             {% endfor %}
         </div>
+
+        <!-- Pagination -->
+        {% if authors.has_other_pages %}
+        <nav class="mt-5" aria-label="navigation">
+            <ul class="pagination justify-content-center">
+                {% if authors.has_previous %}
+                <li class="page-item">
+                    <a class="page-link"
+                        href="?page={{ authors.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}">
+                        <i class="bi bi-chevron-left"></i> Prev
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link" href="#"><i class="bi bi-chevron-left"></i> Prev</a>
+                </li>
+                {% endif %}
+
+                {% for num in authors.paginator.page_range %}
+                {% if authors.number == num %}
+                <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+                {% elif num > authors.number|add:'-3' and num < authors.number|add:'3' %} <li class="page-item"><a
+                        class="page-link" href="?page={{ num }}{% if search_query %}&q={{ search_query }}{% endif %}">{{
+                        num }}</a></li>
+                    {% endif %}
+                    {% endfor %}
+
+                    {% if authors.has_next %}
+                    <li class="page-item">
+                        <a class="page-link"
+                            href="?page={{ authors.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}">
+                            Next <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#">Next <i class="bi bi-chevron-right"></i></a>
+                    </li>
+                    {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
     </div>
 </section>
+<!-- =======================
+Author list END -->
+
 {% endblock %}

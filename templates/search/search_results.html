@@ -1,0 +1,228 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Search Results for "{{ query }}" - Blogzine{% endblock %}
+
+{% block content %}
+
+<!-- =======================
+Inner intro START -->
+<section class="pt-4">
+	<div class="container">
+		<div class="row">
+      <div class="col-12">
+				<div class="border p-4 text-center rounded-3">
+					<h1>Search Results for "{{ query }}"</h1>
+					<p class="lead mb-2">{{ paginator.count }} result{{ paginator.count|pluralize }} found</p>
+					<nav class="d-flex justify-content-center" aria-label="breadcrumb">
+						<ol class="breadcrumb breadcrumb-dots m-0">
+							<li class="breadcrumb-item"><a href="{% url 'home' %}"><i class="bi bi-house me-1"></i> Home</a></li>
+							<li class="breadcrumb-item active">Search Results</li>
+						</ol>
+					</nav>
+				</div>
+      </div>
+    </div>
+	</div>
+</section>
+<!-- =======================
+Inner intro END -->
+
+<!-- =======================
+Main content START -->
+<section class="position-relative pt-0">
+	<div class="container" data-sticky-container>
+		<div class="row">
+			<!-- Main Post START -->
+			<div class="col-lg-9">
+				{% if results %}
+					{% for post in results %}
+					<!-- Card item START -->
+					<div class="card mb-4">
+						<div class="row">
+							<div class="col-md-5">
+								{% if post.featured_image %}
+								<img class="rounded-3" src="{{ post.featured_image.url }}" alt="{{ post.title }}" style="width: 100%; height: 250px; object-fit: cover;">
+								{% else %}
+								<img class="rounded-3" src="{% static 'assets/images/blog/4by3/01.jpg' %}" alt="{{ post.title }}" style="width: 100%; height: 250px; object-fit: cover;">
+								{% endif %}
+							</div>
+							<div class="col-md-7 mt-3 mt-md-0">
+								{% if post.category %}
+								<a href="{% url 'category_posts' post.category.slug %}" class="badge text-bg-danger mb-2"><i class="fas fa-circle me-2 small fw-bold"></i>{{ post.category.name }}</a>
+								{% endif %}
+								<h3><a href="{{ post.get_absolute_url }}" class="btn-link stretched-link text-reset">{{ post.title }}</a></h3>
+								<p>{{ post.excerpt|default:post.content|striptags|truncatechars:200 }}</p>
+								<!-- Card info -->
+								<ul class="nav nav-divider align-items-center d-none d-sm-inline-block">
+									<li class="nav-item">
+										<div class="nav-link">
+											<div class="d-flex align-items-center position-relative">
+												<div class="avatar avatar-xs">
+													{% if post.author.profile_picture %}
+													<img class="avatar-img rounded-circle" src="{{ post.author.profile_picture.url }}" alt="{{ post.author.username }}">
+													{% else %}
+													<img class="avatar-img rounded-circle" src="{% static 'assets/images/avatar/01.jpg' %}" alt="avatar">
+													{% endif %}
+												</div>
+												<span class="ms-3">by <a href="{% url 'user_profile' post.author.username %}" class="stretched-link text-reset btn-link">{{ post.author.get_full_name|default:post.author.username }}</a></span>
+											</div>
+										</div>
+									</li>
+									<li class="nav-item">{{ post.published_date|date:"M d, Y" }}</li>
+									<li class="nav-item">{{ post.get_read_time }} min read</li>
+								</ul>
+							</div>
+						</div>
+					</div>
+					<!-- Card item END -->
+					{% endfor %}
+				{% else %}
+					<!-- No results found -->
+					<div class="card mb-4 text-center py-5">
+						<div class="card-body">
+							<i class="bi bi-search display-1 text-muted mb-3"></i>
+							<h3>No results found for "{{ query }}"</h3>
+							<p class="text-muted mb-4">We couldn't find any posts matching your search. Try different keywords or browse our categories.</p>
+							<div class="d-flex justify-content-center gap-3">
+								<a href="{% url 'post_list' %}" class="btn btn-primary">Browse All Posts</a>
+								<a href="{% url 'category_list' %}" class="btn btn-outline-secondary">View Categories</a>
+							</div>
+						</div>
+					</div>
+				{% endif %}
+
+				<!-- Pagination START -->
+				{% if results.has_other_pages %}
+				<nav class="my-5" aria-label="navigation">
+				  <ul class="pagination d-inline-block d-md-flex justify-content-center">
+				    {% if results.has_previous %}
+				    <li class="page-item">
+				      <a class="page-link" href="?q={{ query }}&page={{ results.previous_page_number }}" tabindex="-1">Prev</a>
+				    </li>
+				    {% else %}
+				    <li class="page-item disabled">
+				      <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Prev</a>
+				    </li>
+				    {% endif %}
+				    
+				    {% for num in results.paginator.page_range %}
+				    	{% if results.number == num %}
+				    	<li class="page-item active"><a class="page-link" href="?q={{ query }}&page={{ num }}">{{ num }}</a></li>
+				    	{% elif num > results.number|add:'-3' and num < results.number|add:'3' %}
+				    	<li class="page-item"><a class="page-link" href="?q={{ query }}&page={{ num }}">{{ num }}</a></li>
+				    	{% endif %}
+				    {% endfor %}
+				    
+				    {% if results.has_next %}
+				    <li class="page-item">
+				      <a class="page-link" href="?q={{ query }}&page={{ results.next_page_number }}">Next</a>
+				    </li>
+				    {% else %}
+				    <li class="page-item disabled">
+				      <a class="page-link" href="#">Next</a>
+				    </li>
+				    {% endif %}
+				  </ul>
+				</nav>
+				{% endif %}
+				<!-- Pagination END -->
+			</div>
+			<!-- Main Post END -->
+
+			<!-- Sidebar START -->
+			<div class="col-lg-3 mt-5 mt-lg-0">
+				<div data-sticky data-margin-top="80" data-sticky-for="767">
+					<!-- Trending topics widget START -->
+					<div>
+						<h4 class="mb-3">Trending topics</h4>
+						{% for category in trending_categories|slice:":5" %}
+						<!-- Category item -->
+						<div class="text-center mb-3 card-bg-scale position-relative overflow-hidden rounded" style="background-image:url({% if category.image %}{{ category.image.url }}{% else %}{% static 'assets/images/blog/4by3/0' %}{{ forloop.counter }}.jpg{% endif %}); background-position: center left; background-size: cover;">
+							<div class="bg-dark-overlay-4 p-3">
+								<a href="{% url 'category_posts' category.slug %}" class="stretched-link btn-link fw-bold text-white h5">{{ category.name }}</a>
+							</div>
+						</div>
+						{% endfor %}
+						<!-- View All Category button -->
+						<div class="text-center mt-3">
+							<a href="{% url 'category_list' %}" class="fw-bold text-body-secondary text-primary-hover"><u>View all categories</u></a>
+						</div>
+					</div>
+					<!-- Trending topics widget END -->
+
+					<div class="row">
+						<!-- Recent post widget START -->
+						<div class="col-12 col-sm-6 col-lg-12">
+							<h4 class="mt-4 mb-3">Recent posts</h4>
+							{% for post in recent_posts|slice:":4" %}
+							<!-- Recent post item -->
+							<div class="card mb-3">
+								<div class="row g-3">
+									<div class="col-4">
+										{% if post.featured_image %}
+										<img class="rounded" src="{{ post.featured_image.url }}" alt="{{ post.title }}" style="width: 80px; height: 60px; object-fit: cover;">
+										{% else %}
+										<img class="rounded" src="{% static 'assets/images/blog/4by3/thumb/0' %}{{ forloop.counter }}.jpg" alt="">
+										{% endif %}
+									</div>
+									<div class="col-8">
+										<h6><a href="{{ post.get_absolute_url }}" class="btn-link stretched-link text-reset fw-bold">{{ post.title|truncatechars:40 }}</a></h6>
+										<div class="small mt-1">{{ post.published_date|date:"M d, Y" }}</div>
+									</div>
+								</div>
+							</div>
+							{% endfor %}
+						</div>
+						<!-- Recent post widget END -->
+
+						<!-- ADV widget START -->
+						<div class="col-12 col-sm-6 col-lg-12 my-4">
+							<a href="#" class="d-block card-img-flash">
+								<img src="{% static 'assets/images/adv.png' %}" alt="Advertisement">
+							</a>
+							<div class="smaller text-end mt-2">ads via <a href="#" class="text-body-secondary"><u>Bootstrap</u></a></div>
+						</div>
+						<!-- ADV widget END -->
+
+						<!-- Popular Tags widget START -->
+						<div class="col-12 col-sm-6 col-lg-12">
+							<h4 class="mt-4 mb-3">Popular tags</h4>
+							<ul class="list-inline">
+								{% for tag in popular_tags|slice:":10" %}
+								<li class="list-inline-item mb-2">
+									<a href="{% url 'tag_posts' tag.slug %}" class="btn btn-sm btn-primary-soft">{{ tag.name }}</a>
+								</li>
+								{% endfor %}
+							</ul>
+						</div>
+						<!-- Popular Tags widget END -->
+					</div>
+				</div>
+			</div>
+			<!-- Sidebar END -->
+		</div> <!-- Row end -->
+	</div>
+</section>
+<!-- =======================
+Main content END -->
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+	// Highlight search terms
+	document.addEventListener('DOMContentLoaded', function() {
+		const query = "{{ query|escapejs }}";
+		if (query && query.length > 2) {
+			const regex = new RegExp(`(${query})`, 'gi');
+			const postContents = document.querySelectorAll('.card p');
+			postContents.forEach(el => {
+				if (el.innerHTML) {
+					el.innerHTML = el.innerHTML.replace(regex, '<mark class="bg-warning bg-opacity-25">$1</mark>');
+				}
+			});
+		}
+	});
+</script>
+{% endblock %}

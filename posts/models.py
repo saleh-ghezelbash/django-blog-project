@@ -79,6 +79,17 @@ class Post(models.Model):
             return 'Not rated'
         return f'{self.rating} / 10'
 
+    def get_media_type(self):
+        """Determine if post has video, audio, or gallery"""
+        if hasattr(self, 'video') and self.video:
+            return 'video'
+        elif hasattr(self, 'audio') and self.audio:
+            return 'audio'
+        elif self.images.count() > 1:
+            return 'gallery'
+        return 'standard'
+
+
 class PostImage(models.Model):
     post = models.ForeignKey(Post, related_name='images', on_delete=models.CASCADE)
     image = models.ImageField(upload_to='post_images/')

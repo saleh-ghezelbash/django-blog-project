@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Author Dashboard - Blogzine{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 mb-4">
+                <h1>Author Dashboard</h1>
+                <p class="lead">Welcome back, {{ user.get_full_name|default:user.username }}!</p>
+            </div>
+            
+            <!-- Stats Cards -->
+            <div class="col-md-3">
+                <div class="card bg-primary text-white mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Posts</h5>
+                        <h2 class="display-4">{{ total_posts }}</h2>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card bg-success text-white mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Views</h5>
+                        <h2 class="display-4">{{ total_views }}</h2>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card bg-info text-white mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Comments</h5>
+                        <h2 class="display-4">{{ total_comments }}</h2>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card bg-warning text-white mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Followers</h5>
+                        <h2 class="display-4">{{ followers_count }}</h2>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Posts -->
+            <div class="col-12 mt-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Your Recent Posts</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Date</th>
+                                        <th>Views</th>
+                                        <th>Comments</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for post in recent_posts %}
+                                    <tr>
+                                        <td>{{ post.title|truncatechars:30 }}</td>
+                                        <td>{{ post.published_date|date:"M d, Y" }}</td>
+                                        <td>{{ post.views_count }}</td>
+                                        <td>{{ post.comments.count }}</td>
+                                        <td>
+                                            <span class="badge {% if post.status == 'published' %}bg-success{% else %}bg-warning{% endif %}">
+                                                {{ post.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a href="{{ post.get_absolute_url }}" class="btn btn-sm btn-info" target="_blank">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a href="{% url 'post_update' post.pk %}" class="btn btn-sm btn-primary">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a href="{% url 'post_delete' post.pk %}" class="btn btn-sm btn-danger">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <a href="{% url 'post_create' %}" class="btn btn-primary mt-3">
+                            <i class="bi bi-plus-circle me-2"></i>Create New Post
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
