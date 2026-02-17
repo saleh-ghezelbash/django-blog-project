@@ -65,7 +65,7 @@ Main content START -->
 													<img class="avatar-img rounded-circle" src="{% static 'assets/images/avatar/01.jpg' %}" alt="avatar">
 													{% endif %}
 												</div>
-												<span class="ms-3">by <a href="{% url 'user_profile' post.author.username %}" class="stretched-link text-reset btn-link">{{ post.author.get_full_name|default:post.author.username }}</a></span>
+												<span class="ms-3">by <a href="{% url 'author_profile' post.author.username %}" class="stretched-link text-reset btn-link">{{ post.author.get_full_name|default:post.author.username }}</a></span>
 											</div>
 										</div>
 									</li>

@@ -3,6 +3,8 @@ from django.shortcuts import render
 from .models import Category
 from posts.models import Post
 from taggit.models import Tag
+from django.db.models import Count
+from django.shortcuts import render, get_object_or_404
 
 def category_list(request):
     # Get all categories
@@ -29,16 +31,42 @@ def category_list(request):
         'default_tags': default_tags,
     })
 
+
+from django.shortcuts import render, get_object_or_404
+from django.core.paginator import Paginator
+from django.db.models import Count, Q
+from .models import Category
+from posts.models import Post
+
 def category_posts(request, slug):
+    """Display posts in a specific category"""
     category = get_object_or_404(Category, slug=slug)
-    posts_list = Post.objects.filter(category=category, status='published').order_by('-published_date')
+    
+    # Get published posts in this category
+    posts_list = Post.objects.filter(
+        category=category, 
+        status='published'
+    ).select_related('author', 'category').prefetch_related('tags', 'comments').order_by('-published_date')
     
     # Pagination
-    paginator = Paginator(posts_list, 10)  # 10 posts per page
+    paginator = Paginator(posts_list, 6)  # 6 posts per page (2 columns of 3 rows)
     page = request.GET.get('page')
     posts = paginator.get_page(page)
     
-    return render(request, 'categories/category_posts.html', {
+    # Get author count for this category
+    author_count = Post.objects.filter(
+        category=category,
+        status='published'
+    ).values('author').distinct().count()
+    
+    # Add author_count to category object
+    category.author_count = author_count
+    
+    context = {
         'category': category,
-        'posts': posts
-    })
+        'posts': posts,
+        'page_title': f'{category.name} - Category',
+        'meta_description': category.description or f'Explore all posts in the {category.name} category.',
+    }
+    
+    return render(request, 'categories/category_posts.html', context)    

@@ -12,71 +12,85 @@ Main hero START -->
 		<div class="row g-0">
 			<div class="col-xxl-10 mx-auto rounded-3 overflow-hidden">
 				<div class="tiny-slider arrow-hover arrow-blur arrow-round position-relative">
-					<div class="tiny-slider-inner"
-					data-autoplay="false"
-					data-hoverpause="true"
-					data-gutter="2"
-					data-arrow="false"
-					data-dots="true"
-					data-items="1">
+					<div class="tiny-slider-inner" data-autoplay="false" data-hoverpause="true" data-gutter="2"
+						data-arrow="false" data-dots="true" data-items="1">
 						<!-- Slide item -->
 						{% for post in hero_posts %}
-						<div class="card bg-dark-overlay-3 rounded-0 h-400 h-lg-500 h-xl-700 position-relative overflow-hidden" style="background-image:url({% if post.featured_image %}{{ post.featured_image.url }}{% else %}{% static 'assets/images/blog/16by9/big/02.jpg' %}{% endif %}); background-position: center left; background-size: cover;">
+						<div class="card bg-dark-overlay-3 rounded-0 h-400 h-lg-500 h-xl-700 position-relative overflow-hidden"
+							style="background-image:url({% if post.featured_image %}{{ post.featured_image.url }}{% else %}{% static 'assets/images/blog/16by9/big/02.jpg' %}{% endif %}); background-position: center left; background-size: cover;">
 							<!-- Card Image overlay -->
-							<div class="card-img-overlay rounded-0 d-flex align-items-center"> 
+							<div class="card-img-overlay rounded-0 d-flex align-items-center">
 								<div class="container px-3 my-auto">
 									<div class="row">
-									<div class="col-lg-7">
-										<!-- Card category -->
-										{% if post.category %}
-										<a href="{% url 'category_posts' post.category.slug %}" class="badge text-bg-danger mb-2"><i class="fas fa-circle me-2 small fw-bold"></i>{{ post.category.name }}</a>
-										{% endif %}
-										<!-- Card title -->
-										<h2 class="text-white display-5"><a href="{{ post.get_absolute_url }}" class="btn-link text-reset fw-normal">{{ post.title }}</a></h2>
-										<p class="text-white">{{ post.excerpt|default:post.content|striptags|truncatechars:150 }}</p>
-										<!-- Card info -->
-										<ul class="nav nav-divider text-white-force align-items-center d-none d-sm-inline-block">
-											<li class="nav-item">
-												<div class="nav-link">
-													<div class="d-flex align-items-center text-white position-relative">
-														<div class="avatar avatar-sm">
-															{% if post.author.profile_picture %}
-															<img class="avatar-img rounded-circle" src="{{ post.author.profile_picture.url }}" alt="{{ post.author.username }}">
-															{% else %}
-															<img class="avatar-img rounded-circle" src="{% static 'assets/images/avatar/11.jpg' %}" alt="avatar">
-															{% endif %}
+										<div class="col-lg-7">
+											<!-- Card category -->
+											{% if post.category %}
+											<a href="{% url 'category_posts' post.category.slug %}"
+												class="badge text-bg-danger mb-2"><i
+													class="fas fa-circle me-2 small fw-bold"></i>{{ post.category.name }}
+												</a>
+											{% endif %}
+											<!-- Card title -->
+											<h2 class="text-white display-5"><a href="{{ post.get_absolute_url }}"
+													class="btn-link text-reset fw-normal">{{ post.title }}</a></h2>
+											<p class="text-white">
+												{{ post.excerpt|default:post.content|striptags|truncatechars:150 }}</p>
+											<!-- Card info -->
+											<ul
+												class="nav nav-divider text-white-force align-items-center d-none d-sm-inline-block">
+												<li class="nav-item">
+													<div class="nav-link">
+														<div
+															class="d-flex align-items-center text-white position-relative">
+															<div class="avatar avatar-sm">
+																{% if post.author.profile_picture %}
+																<img class="avatar-img rounded-circle"
+																	src="{{ post.author.profile_picture.url }}"
+																	alt="{{ post.author.username }}">
+																{% else %}
+																<img class="avatar-img rounded-circle"
+																	src="{% static 'assets/images/avatar/11.jpg' %}"
+																	alt="avatar">
+																{% endif %}
+															</div>
+															<span class="ms-3">by <a
+																	href="{% url 'author_profile' post.author.username %}"
+																	class="stretched-link text-reset btn-link">
+																	{{ post.author.get_full_name|default:post.author.username }}</a></span>
 														</div>
-														<span class="ms-3">by <a href="{% url 'user_profile' post.author.username %}" class="stretched-link text-reset btn-link">{{ post.author.get_full_name|default:post.author.username }}</a></span>
 													</div>
-												</div>
-											</li>
-											<li class="nav-item">{{ post.published_date|date:"M d, Y" }}</li>
-											<li class="nav-item">{{ post.get_read_time }} min read</li>
-										</ul>
+												</li>
+												<li class="nav-item">{{ post.published_date|date:"M d, Y" }}</li>
+												<li class="nav-item">{{ post.get_read_time }} min read</li>
+											</ul>
+										</div>
 									</div>
 								</div>
-							</div>
 							</div>
 						</div>
 						{% endfor %}
 					</div>
 
 					<!-- Custom thumb START -->
-					<div class="col-xl-4 custom-thumb pe-5 position-absolute top-50 end-0 translate-middle-y d-none d-xxl-block" id="custom-thumb">
+					<div class="col-xl-4 custom-thumb pe-5 position-absolute top-50 end-0 translate-middle-y d-none d-xxl-block"
+						id="custom-thumb">
 						{% for post in hero_posts|slice:":3" %}
 						<div class="row align-items-center g-3 mb-4">
 							<div class="col-auto">
 								<div class="avatar avatar-lg">
 									{% if post.featured_image %}
-									<img class="avatar-img rounded-circle" src="{{ post.featured_image.url }}" alt="{{ post.title }}">
+									<img class="avatar-img rounded-circle" src="{{ post.featured_image.url }}"
+										alt="{{ post.title }}">
 									{% else %}
-									<img class="avatar-img rounded-circle" src="{% static 'assets/images/blog/16by9/big/02.jpg' %}" alt="avatar">
+									<img class="avatar-img rounded-circle"
+										src="{% static 'assets/images/blog/16by9/big/02.jpg' %}" alt="avatar">
 									{% endif %}
 								</div>
 							</div>
 							<div class="col-8">
 								<h4 class="fw-normal text-truncate mb-1">{{ post.title|truncatechars:40 }}</h4>
-								<p class="text-truncate d-block col-11 small mb-0">{{ post.excerpt|default:post.content|striptags|truncatechars:60 }}</p>
+								<p class="text-truncate d-block col-11 small mb-0">
+									{{ post.excerpt|default:post.content|striptags|truncatechars:60 }}</p>
 							</div>
 						</div>
 						{% endfor %}
@@ -102,42 +116,41 @@ Highlights START -->
 					<p class="m-0">Latest breaking news, pictures, videos, and special reports</p>
 				</div>
 				<div class="tiny-slider arrow-hover arrow-blur arrow-dark arrow-round mt-3">
-					<div class="tiny-slider-inner"
-						data-autoplay="true"
-						data-hoverpause="true"
-						data-gutter="24"
-						data-arrow="true"
-						data-dots="false"
-						data-items-xl="4"
-						data-items-lg="3" 
-						data-items-md="3" 
-						data-items-sm="2" 
-						data-items-xs="1">
+					<div class="tiny-slider-inner" data-autoplay="true" data-hoverpause="true" data-gutter="24"
+						data-arrow="true" data-dots="false" data-items-xl="4" data-items-lg="3" data-items-md="3"
+						data-items-sm="2" data-items-xs="1">
 
 						<!-- Card item START -->
 						{% for post in highlights_posts %}
 						<div class="card">
 							<!-- Card img -->
 							<div class="position-relative">
-								<img class="card-img" src="{% if post.featured_image %}{{ post.featured_image.url }}{% else %}{% static 'assets/images/blog/4by3/07.jpg' %}{% endif %}" alt="{{ post.title }}" style="height: 200px; object-fit: cover;">
+								<img class="card-img"
+									src="{% if post.featured_image %}{{ post.featured_image.url }}{% else %}{% static 'assets/images/blog/4by3/07.jpg' %}{% endif %}"
+									alt="{{ post.title }}" style="height: 200px; object-fit: cover;">
 								<div class="card-img-overlay d-flex align-items-start flex-column p-3">
 									<!-- Card overlay Top -->
 									<div class="w-100 mb-auto d-flex justify-content-end">
 										<div class="text-end ms-auto">
 											<!-- Card format icon -->
-											<div class="icon-md bg-white bg-opacity-10 bg-blur text-white fw-bold rounded-circle" title="8.5 rating">{{ post.rating|default:"8.5" }}</div>
+											<div class="icon-md bg-white bg-opacity-10 bg-blur text-white fw-bold rounded-circle"
+												title="8.5 rating">{{ post.rating|default:"8.5" }}</div>
 										</div>
 									</div>
 									<!-- Card overlay bottom -->
 									<div class="w-100 mt-auto">
 										{% if post.category %}
-										<a href="{% url 'category_posts' post.category.slug %}" class="badge text-bg-info mb-2"><i class="fas fa-circle me-2 small fw-bold"></i>{{ post.category.name }}</a>
+										<a href="{% url 'category_posts' post.category.slug %}"
+											class="badge text-bg-info mb-2"><i
+												class="fas fa-circle me-2 small fw-bold"></i>{{ post.category.name }}
+											</a>
 										{% endif %}
 									</div>
 								</div>
 							</div>
 							<div class="card-body px-0 pt-3">
-								<h5 class="card-title"><a href="{{ post.get_absolute_url }}" class="btn-link text-reset fw-bold">{{ post.title|truncatechars:50 }}</a></h5>
+								<h5 class="card-title"><a href="{{ post.get_absolute_url }}"
+										class="btn-link text-reset fw-bold">{{ post.title|truncatechars:50 }}</a></h5>
 								<!-- Card info -->
 								<ul class="nav nav-divider align-items-center">
 									<li class="nav-item">
@@ -145,12 +158,18 @@ Highlights START -->
 											<div class="d-flex align-items-center position-relative">
 												<div class="avatar avatar-xs">
 													{% if post.author.profile_picture %}
-													<img class="avatar-img rounded-circle" src="{{ post.author.profile_picture.url }}" alt="{{ post.author.username }}">
+													<img class="avatar-img rounded-circle"
+														src="{{ post.author.profile_picture.url }}"
+														alt="{{ post.author.username }}">
 													{% else %}
-													<img class="avatar-img rounded-circle" src="{% static 'assets/images/avatar/07.jpg' %}" alt="avatar">
+													<img class="avatar-img rounded-circle"
+														src="{% static 'assets/images/avatar/07.jpg' %}" alt="avatar">
 													{% endif %}
 												</div>
-												<span class="ms-3">by <a href="{% url 'user_profile' post.author.username %}" class="stretched-link text-reset btn-link">{{ post.author.get_full_name|default:post.author.username|truncatechars:10 }}</a></span>
+												<span class="ms-3">by <a
+														href="{% url 'author_profile' post.author.username %}"
+														class="stretched-link text-reset btn-link">
+														{{ post.author.get_full_name|default:post.author.username|truncatechars:10 }}</a></span>
 											</div>
 										</div>
 									</li>
@@ -200,36 +219,64 @@ Top highlights START -->
 				<div class="row gy-4">
 					<div class="col-lg-7">
 						{% with featured_post=top_highlights.0 %}
-						<div class="card card-overlay-bottom card-bg-scale h-400 h-lg-560" style="background-image:url({% if featured_post.featured_image %}{{ featured_post.featured_image.url }}{% else %}{% static 'assets/images/blog/16by9/05.jpg' %}{% endif %}); background-position: center left; background-size: cover;">
+						<div class="card card-overlay-bottom card-bg-scale h-400 h-lg-560"
+							style="background-image:url({% if featured_post.featured_image %}{{ featured_post.featured_image.url }}{% else %}{% static 'assets/images/blog/16by9/05.jpg' %}{% endif %}); background-position: center left; background-size: cover;">
 							<!-- Card Image overlay -->
-							<div class="card-img-overlay d-flex align-items-center p-3 p-sm-5"> 
+							<div class="card-img-overlay d-flex align-items-center p-3 p-sm-5">
 								<div class="w-100 mt-auto">
 									<div class="col">
 										<!-- Card category -->
 										{% if featured_post.category %}
-										<a href="{% url 'category_posts' featured_post.category.slug %}" class="badge bg-primary mb-2"><i class="fas fa-circle me-2 small fw-bold"></i>{{ featured_post.category.name }}</a>
+										<a href="{% url 'category_posts' featured_post.category.slug %}"
+											class="badge bg-primary mb-2"><i
+												class="fas fa-circle me-2 small fw-bold"></i>
+											{{ featured_post.category.name }}</a>
 										{% endif %}
 										<!-- Sponsored badge (optional) -->
 										{% if featured_post.is_sponsored %}
-										<a href="#!" class="badge mb-2 bg-dark z-index-99 position-relative" tabindex="0" role="button" data-bs-container="body" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-placement="top" data-bs-content="You're seeing this ad because your activity meets the intended audience of our site.">
+										<a href="#!" class="badge mb-2 bg-dark z-index-99 position-relative"
+											tabindex="0" role="button" data-bs-container="body" data-bs-toggle="popover"
+											data-bs-trigger="focus" data-bs-placement="top"
+											data-bs-content="You're seeing this ad because your activity meets the intended audience of our site.">
 											<i class="bi bi-info-circle pe-1"></i> Sponsored
 										</a>
 										{% endif %}
 										<!-- Card title -->
-										<h2 class="text-white display-6"><a href="{{ featured_post.get_absolute_url }}" class="btn-link text-reset stretched-link fw-normal">{{ featured_post.title|truncatechars:60 }}</a></h2>
+										<h2 class="text-white display-6"><a href="{{ featured_post.get_absolute_url }}"
+												class="btn-link text-reset stretched-link fw-normal">
+												{{ featured_post.title|truncatechars:60 }}</a></h2>
 										<!-- Card info -->
-										<ul class="nav nav-divider text-white-force align-items-center d-none d-sm-inline-block">
+										<ul
+											class="nav nav-divider text-white-force align-items-center d-none d-sm-inline-block">
 											<li class="nav-item">
 												<div class="nav-link">
 													<div class="d-flex align-items-center text-white position-relative">
 														<div class="avatar avatar-sm">
 															{% if featured_post.author.profile_picture %}
-															<img class="avatar-img rounded-circle" src="{{ featured_post.author.profile_picture.url }}" alt="{{ featured_post.author.username }}">
+															<img class="avatar-img rounded-circle"
+																src="{{ featured_post.author.profile_picture.url }}"
+																alt="{{ featured_post.author.username }}">
 															{% else %}
-															<img class="avatar-img rounded-circle" src="{% static 'assets/images/avatar/01.jpg' %}" alt="avatar">
+															<img class="avatar-img rounded-circle"
+																src="{% static 'assets/images/avatar/01.jpg' %}"
+																alt="avatar">
 															{% endif %}
 														</div>
-														<span class="ms-3">by <a href="{% url 'user_profile' featured_post.author.username %}" class="stretched-link text-reset btn-link">{{ featured_post.author.get_full_name|default:featured_post.author.username }}</a></span>
+														<span class="ms-3">
+															{% if featured_post.author and featured_post.author.username %}
+															
+															by <a
+																href="{% url 'author_profile' featured_post.author.username %}"
+																class="stretched-link text-reset btn-link">
+																{{ featured_post.author.get_full_name|default:featured_post.author.username }}
+																
+																
+															</a>
+															{% else %}
+															by <span class="text-white-50">Unknown Author</span>
+															{% endif %}
+														</span>
+														
 													</div>
 												</div>
 											</li>
@@ -249,16 +296,21 @@ Top highlights START -->
 							<div class="row g-3">
 								<div class="col-4">
 									{% if post.featured_image %}
-									<img class="rounded-3" src="{{ post.featured_image.url }}" alt="{{ post.title }}" style="width: 100%; height: 80px; object-fit: cover;">
+									<img class="rounded-3" src="{{ post.featured_image.url }}" alt="{{ post.title }}"
+										style="width: 100%; height: 80px; object-fit: cover;">
 									{% else %}
 									<img class="rounded-3" src="{% static 'assets/images/blog/4by3/01.jpg' %}" alt="">
 									{% endif %}
 								</div>
 								<div class="col-8">
 									{% if post.category %}
-									<a href="{% url 'category_posts' post.category.slug %}" class="badge bg-danger bg-opacity-10 text-danger mb-2"><i class="fas fa-circle me-2 small fw-bold"></i>{{ post.category.name }}</a>
+									<a href="{% url 'category_posts' post.category.slug %}"
+										class="badge bg-danger bg-opacity-10 text-danger mb-2"><i
+											class="fas fa-circle me-2 small fw-bold"></i>{{ post.category.name }}</a>
 									{% endif %}
-									<h5><a href="{{ post.get_absolute_url }}" class="btn-link stretched-link text-reset fw-bold">{{ post.title|truncatechars:40 }}</a></h5>
+									<h5><a href="{{ post.get_absolute_url }}"
+											class="btn-link stretched-link text-reset fw-bold">
+											{{ post.title|truncatechars:40 }}</a></h5>
 									<!-- Card info -->
 									<ul class="nav nav-divider align-items-center d-none d-sm-inline-block">
 										<li class="nav-item">
@@ -266,14 +318,21 @@ Top highlights START -->
 												<div class="d-flex align-items-center position-relative">
 													<div class="avatar avatar-xs">
 														{% if post.author.profile_picture %}
-														<img class="avatar-img rounded-circle" src="{{ post.author.profile_picture.url }}" alt="{{ post.author.username }}">
+														<img class="avatar-img rounded-circle"
+															src="{{ post.author.profile_picture.url }}"
+															alt="{{ post.author.username }}">
 														{% else %}
 														<div class="avatar-img rounded-circle bg-primary bg-opacity-10">
-															<span class="text-primary position-absolute top-50 start-50 translate-middle fw-bold small">{{ post.author.username|slice:":2"|upper }}</span>
+															<span
+																class="text-primary position-absolute top-50 start-50 translate-middle fw-bold small">
+																{{ post.author.username|slice:":2"|upper }}</span>
 														</div>
 														{% endif %}
 													</div>
-													<span class="ms-3">by <a href="{% url 'user_profile' post.author.username %}" class="stretched-link text-reset btn-link">{{ post.author.get_full_name|default:post.author.username|truncatechars:8 }}</a></span>
+													<span class="ms-3">by <a
+															href="{% url 'author_profile' post.author.username %}"
+															class="stretched-link text-reset btn-link">
+															{{ post.author.get_full_name|default:post.author.username|truncatechars:8 }}</a></span>
 												</div>
 											</div>
 										</li>
@@ -302,30 +361,25 @@ Trending topics START -->
 				<!-- Title -->
 				<div class="d-sm-flex justify-content-between align-items-center mb-4">
 					<h2 class="m-0">Trending topics</h2>
-					<a href="{% url 'category_list' %}" class="text-body text-primary-hover"><u>View all categories</u></a>
+					<a href="{% url 'category_list' %}" class="text-body text-primary-hover"><u>View all
+							categories</u></a>
 				</div>
 				<!-- Slider -->
 				<div class="tiny-slider arrow-hover arrow-dark arrow-blur arrow-round">
-					<div class="tiny-slider-inner"
-					data-autoplay="false"
-					data-hoverpause="true"
-					data-gutter="24"
-					data-arrow="true"
-					data-dots="false"
-					data-items-xl="5" 
-					data-items-lg="4" 
-					data-items-md="3" 
-					data-items-sm="2" 
-					data-items-xs="2"
-					>
+					<div class="tiny-slider-inner" data-autoplay="false" data-hoverpause="true" data-gutter="24"
+						data-arrow="true" data-dots="false" data-items-xl="5" data-items-lg="4" data-items-md="3"
+						data-items-sm="2" data-items-xs="2">
 						<!-- Category item -->
 						{% for category in trending_categories %}
 						<div>
 							<div class="card card-overlay-bottom card-img-scale">
-								<img class="card-img" src="{% if category.image %}{{ category.image.url }}{% else %}{% static 'assets/images/blog/1by1/thumb/01.jpg' %}{% endif %}" alt="{{ category.name }}" style="height: 200px; object-fit: cover;">
+								<img class="card-img"
+									src="{% if category.image %}{{ category.image.url }}{% else %}{% static 'assets/images/blog/1by1/thumb/01.jpg' %}{% endif %}"
+									alt="{{ category.name }}" style="height: 200px; object-fit: cover;">
 								<div class="card-img-overlay d-flex px-3 px-sm-5">
 									<h5 class="mt-auto mx-auto">
-										<a href="{% url 'category_posts' category.slug %}" class="stretched-link btn-link fw-bold text-white">{{ category.name }}</a>
+										<a href="{% url 'category_posts' category.slug %}"
+											class="stretched-link btn-link fw-bold text-white">{{ category.name }}</a>
 									</h5>
 								</div>
 							</div>
@@ -345,42 +399,56 @@ Sports update START -->
 <section>
 	<div class="container">
 		<div class="row">
-				<!-- Title -->
+			<!-- Title -->
 			<div class="col-12 mb-4">
 				<h2 class="m-0"><i class="bi bi-controller me-2"></i>Sports update</h2>
-				<p class="m-0">Get the latest sports news and updates from football, tennis, formula one, cricket, NBA, and golf with live scores and stats</p>
+				<p class="m-0">Get the latest sports news and updates from football, tennis, formula one, cricket, NBA,
+					and golf with live scores and stats</p>
 			</div>
 		</div>
 		<div class="row">
 			{% for post in sports_posts|slice:":2" %}
 			<div class="col-md-6 mb-4 mb-md-0">
 				<!-- Card item START -->
-				<div class="card card-overlay-bottom card-bg-scale h-300 h-lg-540" style="background-image:url({% if post.featured_image %}{{ post.featured_image.url }}{% else %}{% static 'assets/images/blog/16by9/06.jpg' %}{% endif %}); background-position: center left; background-size: cover;">
+				<div class="card card-overlay-bottom card-bg-scale h-300 h-lg-540"
+					style="background-image:url({% if post.featured_image %}{{ post.featured_image.url }}{% else %}{% static 'assets/images/blog/16by9/06.jpg' %}{% endif %}); background-position: center left; background-size: cover;">
 					<!-- Card Image overlay -->
-					<div class="card-img-overlay d-flex align-items-center p-3 p-sm-4"> 
+					<div class="card-img-overlay d-flex align-items-center p-3 p-sm-4">
 						<div class="w-100 mt-auto">
 							<div class="col">
 								<!-- Card category -->
 								{% if post.category %}
-								<a href="{% url 'category_posts' post.category.slug %}" class="badge text-bg-danger mb-2"><i class="fas fa-circle me-2 small fw-bold"></i>{{ post.category.name }}</a>
+								<a href="{% url 'category_posts' post.category.slug %}"
+									class="badge text-bg-danger mb-2"><i class="fas fa-circle me-2 small fw-bold"></i>
+									{{ post.category.name }}</a>
 								{% endif %}
 								<!-- Card title -->
-								<h2 class="text-white display-6"><a href="{{ post.get_absolute_url }}" class="btn-link text-reset stretched-link fw-normal">{{ post.title|truncatechars:50 }}</a></h2>
+								<h2 class="text-white display-6"><a href="{{ post.get_absolute_url }}"
+										class="btn-link text-reset stretched-link fw-normal">
+										{{ post.title|truncatechars:50 }}</a></h2>
 								<!-- Card info -->
-								<ul class="nav nav-divider text-white-force align-items-center d-none d-sm-inline-block">
+								<ul
+									class="nav nav-divider text-white-force align-items-center d-none d-sm-inline-block">
 									<li class="nav-item">
 										<div class="nav-link">
 											<div class="d-flex align-items-center text-white position-relative">
 												<div class="avatar avatar-sm">
 													{% if post.author.profile_picture %}
-													<img class="avatar-img rounded-circle" src="{{ post.author.profile_picture.url }}" alt="{{ post.author.username }}">
+													<img class="avatar-img rounded-circle"
+														src="{{ post.author.profile_picture.url }}"
+														alt="{{ post.author.username }}">
 													{% else %}
 													<div class="avatar-img rounded-circle bg-primary">
-														<span class="text-white position-absolute top-50 start-50 translate-middle fw-bold small">{{ post.author.username|slice:":2"|upper }}</span>
+														<span
+															class="text-white position-absolute top-50 start-50 translate-middle fw-bold small">{{ post.author.username|slice:":2"|upper }}
+															</span>
 													</div>
 													{% endif %}
 												</div>
-												<span class="ms-3">by <a href="{% url 'user_profile' post.author.username %}" class="stretched-link text-reset btn-link">{{ post.author.get_full_name|default:post.author.username|truncatechars:8 }}</a></span>
+												<span class="ms-3">by <a
+														href="{% url 'author_profile' post.author.username %}"
+														class="stretched-link text-reset btn-link">{{ post.author.get_full_name|default:post.author.username|truncatechars:8 }}
+														</a></span>
 											</div>
 										</div>
 									</li>
@@ -421,16 +489,21 @@ Sponsored news START -->
 					<div class="row g-3">
 						<div class="col-4">
 							{% if post.featured_image %}
-							<img class="rounded-3" src="{{ post.featured_image.url }}" alt="{{ post.title }}" style="width: 100%; height: 80px; object-fit: cover;">
+							<img class="rounded-3" src="{{ post.featured_image.url }}" alt="{{ post.title }}"
+								style="width: 100%; height: 80px; object-fit: cover;">
 							{% else %}
 							<img class="rounded-3" src="{% static 'assets/images/blog/4by3/01.jpg' %}" alt="">
 							{% endif %}
 						</div>
 						<div class="col-8">
 							{% if post.category %}
-							<a href="{% url 'category_posts' post.category.slug %}" class="badge bg-danger bg-opacity-10 text-danger mb-2"><i class="fas fa-circle me-2 small fw-bold"></i>{{ post.category.name }}</a>
+							<a href="{% url 'category_posts' post.category.slug %}"
+								class="badge bg-danger bg-opacity-10 text-danger mb-2"><i
+									class="fas fa-circle me-2 small fw-bold"></i>{{ post.category.name }}</a>
 							{% endif %}
-							<h4><a href="{{ post.get_absolute_url }}" class="btn-link stretched-link text-reset fw-bold">{{ post.title|truncatechars:40 }}</a></h4>
+							<h4><a href="{{ post.get_absolute_url }}"
+									class="btn-link stretched-link text-reset fw-bold">{{ post.title|truncatechars:40 }}
+									</a></h4>
 							<!-- Card info -->
 							<ul class="nav nav-divider align-items-center d-none d-sm-inline-block">
 								<li class="nav-item">
@@ -438,12 +511,18 @@ Sponsored news START -->
 										<div class="d-flex align-items-center position-relative">
 											<div class="avatar avatar-xs">
 												{% if post.author.profile_picture %}
-												<img class="avatar-img rounded-circle" src="{{ post.author.profile_picture.url }}" alt="{{ post.author.username }}">
+												<img class="avatar-img rounded-circle"
+													src="{{ post.author.profile_picture.url }}"
+													alt="{{ post.author.username }}">
 												{% else %}
-												<img class="avatar-img rounded-circle" src="{% static 'assets/images/avatar/01.jpg' %}" alt="avatar">
+												<img class="avatar-img rounded-circle"
+													src="{% static 'assets/images/avatar/01.jpg' %}" alt="avatar">
 												{% endif %}
 											</div>
-											<span class="ms-3">by <a href="{% url 'user_profile' post.author.username %}" class="stretched-link text-reset btn-link">{{ post.author.get_full_name|default:post.author.username|truncatechars:8 }}</a></span>
+											<span class="ms-3">by <a
+													href="{% url 'author_profile' post.author.username %}"
+													class="stretched-link text-reset btn-link">{{ post.author.get_full_name|default:post.author.username|truncatechars:8 }}
+													</a></span>
 										</div>
 									</div>
 								</li>
@@ -462,16 +541,21 @@ Sponsored news START -->
 					<div class="row g-3">
 						<div class="col-4">
 							{% if post.featured_image %}
-							<img class="rounded-3" src="{{ post.featured_image.url }}" alt="{{ post.title }}" style="width: 100%; height: 80px; object-fit: cover;">
+							<img class="rounded-3" src="{{ post.featured_image.url }}" alt="{{ post.title }}"
+								style="width: 100%; height: 80px; object-fit: cover;">
 							{% else %}
 							<img class="rounded-3" src="{% static 'assets/images/blog/4by3/04.jpg' %}" alt="">
 							{% endif %}
 						</div>
 						<div class="col-8">
 							{% if post.category %}
-							<a href="{% url 'category_posts' post.category.slug %}" class="badge bg-warning bg-opacity-15 text-warning mb-2"><i class="fas fa-circle me-2 small fw-bold"></i>{{ post.category.name }}</a>
+							<a href="{% url 'category_posts' post.category.slug %}"
+								class="badge bg-warning bg-opacity-15 text-warning mb-2"><i
+									class="fas fa-circle me-2 small fw-bold"></i>{{ post.category.name }}</a>
 							{% endif %}
-							<h4><a href="{{ post.get_absolute_url }}" class="btn-link stretched-link text-reset fw-bold">{{ post.title|truncatechars:40 }}</a></h4>
+							<h4><a href="{{ post.get_absolute_url }}"
+									class="btn-link stretched-link text-reset fw-bold">{{ post.title|truncatechars:40 }}
+									</a></h4>
 							<!-- Card info -->
 							<ul class="nav nav-divider align-items-center d-none d-sm-inline-block">
 								<li class="nav-item">
@@ -479,14 +563,21 @@ Sponsored news START -->
 										<div class="d-flex align-items-center position-relative">
 											<div class="avatar avatar-xs">
 												{% if post.author.profile_picture %}
-												<img class="avatar-img rounded-circle" src="{{ post.author.profile_picture.url }}" alt="{{ post.author.username }}">
+												<img class="avatar-img rounded-circle"
+													src="{{ post.author.profile_picture.url }}"
+													alt="{{ post.author.username }}">
 												{% else %}
 												<div class="avatar-img rounded-circle bg-danger">
-													<span class="text-white position-absolute top-50 start-50 translate-middle fw-bold small">{{ post.author.username|slice:":2"|upper }}</span>
+													<span
+														class="text-white position-absolute top-50 start-50 translate-middle fw-bold small">{{ post.author.username|slice:":2"|upper }}
+														</span>
 												</div>
 												{% endif %}
 											</div>
-											<span class="ms-3">by <a href="{% url 'user_profile' post.author.username %}" class="stretched-link text-reset btn-link">{{ post.author.get_full_name|default:post.author.username|truncatechars:8 }}</a></span>
+											<span class="ms-3">by <a
+													href="{% url 'author_profile' post.author.username %}"
+													class="stretched-link text-reset btn-link">{{ post.author.get_full_name|default:post.author.username|truncatechars:8 }}
+													</a></span>
 										</div>
 									</div>
 								</li>
@@ -514,10 +605,14 @@ Newsletter START -->
 					<!-- SVG shape START -->
 					<figure class="position-absolute top-50 start-50 translate-middle">
 						<svg width="1848" height="481" viewBox="0 0 1848.9 481.8" xmlns="http://www.w3.org/2000/svg">
-							<path class="fill-success" d="m779.4 251c-10.3-11.5-19.9-23.8-29.4-36.1-9-11.6-18.4-22.8-27.1-34.7-15.3-21.2-30.2-45.8-54.8-53.3-10.5-3.2-21.6-3.2-30.6 2.5-7.6 4.8-13 12.6-17.3 20.9-10.8 20.6-16.1 44.7-24.6 66.7-7.9 20.2-19.4 38.6-33.8 54.3-14.7 16.2-31.7 30-50.4 41-15.9 9.4-33.4 17.2-52 19.3-18.4 2-38-2.5-56.5-6.2-22.4-4.4-45.1-9.7-67.6-10.9-9.8-0.5-19.8-0.3-29.1 2.3-9.8 2.8-18.7 8.6-26.6 15.2-17.3 14.5-30.2 34.4-43.7 52.9-12.9 17.6-26.8 34.9-45.4 45.4-19.5 11-42.6 12.1-65 6.6-52.3-13.1-93.8-56.5-127.9-101.5-8.8-11.6-17.3-23.4-25.6-35.4-0.6-0.9-1.1-1.8-1.6-2.7-1.1-2.4-0.9-2.6 0.6-1.2 1 0.9 1.9 1.9 2.7 3 35.3 47.4 71.5 98.5 123.2 123.9 22.8 11.2 48.2 17.2 71.7 12.2 23-5 40.6-21.2 55.3-39.7 24.5-30.7 46.5-75.6 87.1-83 19.5-3.5 40.7 0.1 60.6 3.7 21.2 3.9 42.3 9.1 63.6 11.7 17.8 2.3 35.8-0.1 52.2-7 20-8.1 38.4-20.2 54.8-34.6 16.2-14.1 31-30.7 41.8-50.4 11.1-20.2 17-43.7 24.9-65.7 6.1-16.9 13.8-36.2 29.3-44.5 16.1-8.6 37.3-1.9 52.3 10.6 18.7 15.6 31.2 39.2 46.7 58.2"/>
-							<path class="fill-warning" d="m1157.9 344.9c9.8 7.6 18.9 15.8 28.1 24 8.6 7.7 17.6 15.2 26 23.2 14.8 14.2 29.5 30.9 51.2 34.7 9.3 1.6 18.8 0.9 26.1-3.8 6.1-3.9 10.2-9.9 13.2-16.2 7.6-15.6 10.3-33.2 15.8-49.6 5.2-15.1 13.6-29 24.7-41.3 11.4-12.6 24.8-23.6 40-32.8 12.9-7.8 27.3-14.6 43.1-17.3 15.6-2.6 32.8-0.7 49 0.7 19.6 1.7 39.4 4 58.8 3.4 8.4-0.3 17-1.1 24.8-3.6 8.2-2.7 15.4-7.4 21.6-12.7 13.7-11.6 23.1-26.7 33.3-40.9 9.6-13.5 20.2-26.9 35.3-35.6 15.8-9.2 35.6-11.6 55.2-9.1 45.7 5.8 84.8 34.3 117.6 64.4 8.7 8 17.2 16.2 25.6 24.6 2.5 3.2 1.9 3-1.2 1-34.3-32-69.7-66.9-116.5-81.9-20.5-6.5-42.7-9.2-62.4-4-19.3 5.1-33.1 17.9-44.3 32.2-18.5 23.7-33.9 57.5-68.1 65.5-16.5 3.8-34.9 2.6-52.3 1.3-18.5-1.4-37-3.7-55.4-4.2-15.5-0.5-30.7 2.5-44.2 8.5-16.5 7.2-31.3 17.1-44.3 28.5-12.8 11.2-24.1 24.1-31.9 39-7.9 15.3-11.1 32.5-16.2 48.9-3.9 12.6-9 26.9-21.6 33.9-13.1 7.3-31.9 3.8-45.7-4.1-17.2-10-29.9-26.1-44.6-38.8"/>
-							<path class="fill-warning opacity-6" d="m1840.8 379c-8.8 40.3-167.8 79.9-300.2 45.3-42.5-11.1-91.4-32-138.7-11.6-38.7 16.7-55 66-90.8 67.4-25.1 1-48.6-20.3-58.1-39.8-31-63.3 50.7-179.9 155.7-208.1 50.4-13.5 97.3-3.2 116.1 1.6 36.3 9.3 328.6 87.4 316 145.2z"/>
-							<path class="fill-success opacity-6" d="M368.3,247.3C265.6,257.2,134,226,110.9,141.5C85,47.2,272.5-9.4,355.5-30.7s182.6-31.1,240.8-18.6    C677.6-31.8,671.5,53.9,627,102C582.6,150.2,470.9,237.5,368.3,247.3z"/>
+							<path class="fill-success"
+								d="m779.4 251c-10.3-11.5-19.9-23.8-29.4-36.1-9-11.6-18.4-22.8-27.1-34.7-15.3-21.2-30.2-45.8-54.8-53.3-10.5-3.2-21.6-3.2-30.6 2.5-7.6 4.8-13 12.6-17.3 20.9-10.8 20.6-16.1 44.7-24.6 66.7-7.9 20.2-19.4 38.6-33.8 54.3-14.7 16.2-31.7 30-50.4 41-15.9 9.4-33.4 17.2-52 19.3-18.4 2-38-2.5-56.5-6.2-22.4-4.4-45.1-9.7-67.6-10.9-9.8-0.5-19.8-0.3-29.1 2.3-9.8 2.8-18.7 8.6-26.6 15.2-17.3 14.5-30.2 34.4-43.7 52.9-12.9 17.6-26.8 34.9-45.4 45.4-19.5 11-42.6 12.1-65 6.6-52.3-13.1-93.8-56.5-127.9-101.5-8.8-11.6-17.3-23.4-25.6-35.4-0.6-0.9-1.1-1.8-1.6-2.7-1.1-2.4-0.9-2.6 0.6-1.2 1 0.9 1.9 1.9 2.7 3 35.3 47.4 71.5 98.5 123.2 123.9 22.8 11.2 48.2 17.2 71.7 12.2 23-5 40.6-21.2 55.3-39.7 24.5-30.7 46.5-75.6 87.1-83 19.5-3.5 40.7 0.1 60.6 3.7 21.2 3.9 42.3 9.1 63.6 11.7 17.8 2.3 35.8-0.1 52.2-7 20-8.1 38.4-20.2 54.8-34.6 16.2-14.1 31-30.7 41.8-50.4 11.1-20.2 17-43.7 24.9-65.7 6.1-16.9 13.8-36.2 29.3-44.5 16.1-8.6 37.3-1.9 52.3 10.6 18.7 15.6 31.2 39.2 46.7 58.2" />
+							<path class="fill-warning"
+								d="m1157.9 344.9c9.8 7.6 18.9 15.8 28.1 24 8.6 7.7 17.6 15.2 26 23.2 14.8 14.2 29.5 30.9 51.2 34.7 9.3 1.6 18.8 0.9 26.1-3.8 6.1-3.9 10.2-9.9 13.2-16.2 7.6-15.6 10.3-33.2 15.8-49.6 5.2-15.1 13.6-29 24.7-41.3 11.4-12.6 24.8-23.6 40-32.8 12.9-7.8 27.3-14.6 43.1-17.3 15.6-2.6 32.8-0.7 49 0.7 19.6 1.7 39.4 4 58.8 3.4 8.4-0.3 17-1.1 24.8-3.6 8.2-2.7 15.4-7.4 21.6-12.7 13.7-11.6 23.1-26.7 33.3-40.9 9.6-13.5 20.2-26.9 35.3-35.6 15.8-9.2 35.6-11.6 55.2-9.1 45.7 5.8 84.8 34.3 117.6 64.4 8.7 8 17.2 16.2 25.6 24.6 2.5 3.2 1.9 3-1.2 1-34.3-32-69.7-66.9-116.5-81.9-20.5-6.5-42.7-9.2-62.4-4-19.3 5.1-33.1 17.9-44.3 32.2-18.5 23.7-33.9 57.5-68.1 65.5-16.5 3.8-34.9 2.6-52.3 1.3-18.5-1.4-37-3.7-55.4-4.2-15.5-0.5-30.7 2.5-44.2 8.5-16.5 7.2-31.3 17.1-44.3 28.5-12.8 11.2-24.1 24.1-31.9 39-7.9 15.3-11.1 32.5-16.2 48.9-3.9 12.6-9 26.9-21.6 33.9-13.1 7.3-31.9 3.8-45.7-4.1-17.2-10-29.9-26.1-44.6-38.8" />
+							<path class="fill-warning opacity-6"
+								d="m1840.8 379c-8.8 40.3-167.8 79.9-300.2 45.3-42.5-11.1-91.4-32-138.7-11.6-38.7 16.7-55 66-90.8 67.4-25.1 1-48.6-20.3-58.1-39.8-31-63.3 50.7-179.9 155.7-208.1 50.4-13.5 97.3-3.2 116.1 1.6 36.3 9.3 328.6 87.4 316 145.2z" />
+							<path class="fill-success opacity-6"
+								d="M368.3,247.3C265.6,257.2,134,226,110.9,141.5C85,47.2,272.5-9.4,355.5-30.7s182.6-31.1,240.8-18.6    C677.6-31.8,671.5,53.9,627,102C582.6,150.2,470.9,237.5,368.3,247.3z" />
 						</svg>
 					</figure>
 					<!-- SVG shape END -->
@@ -525,17 +620,20 @@ Newsletter START -->
 						<div class="col-md-8 col-lg-6 mx-auto text-center py-5 position-relative">
 							<!-- Title -->
 							<h2 class="display-5 text-white">Never miss a story!</h2>
-							<p class="text-white">Get the freshest headlines and updates sent uninterrupted to your inbox.</p>
+							<p class="text-white">Get the freshest headlines and updates sent uninterrupted to your
+								inbox.</p>
 							<!-- Form -->
-							<form class="row row-cols-sm-auto g-2 align-items-center justify-content-center mt-3" action="{% url 'newsletter_subscribe' %}" method="POST">
+							<form class="row row-cols-sm-auto g-2 align-items-center justify-content-center mt-3"
+								action="{% url 'newsletter_subscribe' %}" method="POST">
 								{% csrf_token %}
 								<div class="col-12">
-									<input type="email" name="email" class="form-control form-control-lg" placeholder="Enter your email address" required>
+									<input type="email" name="email" class="form-control form-control-lg"
+										placeholder="Enter your email address" required>
 								</div>
 								<div class="col-12">
 									<button type="submit" class="btn btn-primary btn-lg m-0">Subscribe</button>
 								</div>
-								<div class="form-text text-white opacity-6 mt-2">By subscribing you agree to our 
+								<div class="form-text text-white opacity-6 mt-2">By subscribing you agree to our
 									<a href="#" class="text-decoration-underline text-reset">Privacy Policy</a>
 								</div>
 							</form>
@@ -581,11 +679,11 @@ Newsletter END -->
 					}
 				}
 			};
-			
+
 			if (slider.dataset.autoplayButtonOutput === 'false') {
 				config.autoplayButtonOutput = false;
 			}
-			
+
 			tns(config);
 		});
 	}
@@ -593,7 +691,7 @@ Newsletter END -->
 	// Custom thumb functionality
 	const customThumb = document.querySelector('#custom-thumb');
 	const slides = document.querySelectorAll('.tns-slide');
-	
+
 	if (customThumb && slides.length) {
 		slides.forEach((slide, index) => {
 			slide.addEventListener('mouseenter', () => {

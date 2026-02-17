@@ -26,7 +26,7 @@
                 <!-- Author info START -->
                 <div class="d-flex p-2 p-md-4 my-3 bg-primary bg-opacity-10 rounded">
                     <!-- Avatar -->
-                    <a href="{% url 'user_profile' post.author.username %}">
+                    <a href="{% url 'author_profile' post.author.username %}">
                         <div class="avatar avatar-xxl me-2 me-md-4">
                             {% if post.author.profile_picture %}
                             <img class="avatar-img rounded-circle" src="{{ post.author.profile_picture.url }}" alt="{{ post.author.username }}">
@@ -41,10 +41,10 @@
                     <div>
                         <div class="d-sm-flex align-items-center justify-content-between">
                             <div>
-                                <h4 class="m-0"><a href="{% url 'user_profile' post.author.username %}">{{ post.author.get_full_name|default:post.author.username }}</a></h4>
+                                <h4 class="m-0"><a href="{% url 'author_profile' post.author.username %}">{{ post.author.get_full_name|default:post.author.username }}</a></h4>
                                 <small>Author</small>
                             </div>
-                            <a href="{% url 'user_profile' post.author.username %}" class="btn btn-xs btn-primary-soft">View Profile</a>
+                            <a href="{% url 'author_profile' post.author.username %}" class="btn btn-xs btn-primary-soft">View Profile</a>
                         </div>
                         <p class="my-2">{{ post.author.bio|default:"This author hasn't added a bio yet." }}</p>
                         <!-- Social icons -->

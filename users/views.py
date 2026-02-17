@@ -42,9 +42,6 @@ def change_password(request):
         form = PasswordChangeForm(request.user)
     return render(request, 'users/change_password.html', {'form': form})
 
-def user_profile(request, username):
-    user = get_object_or_404(CustomUser, username=username)
-    return render(request, 'users/user_profile.html', {'profile_user': user})
 
 def register(request):
     if request.method == 'POST':

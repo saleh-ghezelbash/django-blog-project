@@ -33,6 +33,7 @@ urlpatterns = [
 
     path('newsletter/', include('newsletter.urls')),
     path('about/', TemplateView.as_view(template_name='about.html'), name='about'),
+    path('contact/', include('contact.urls')),
     path('author/list/', author_list, name='author_list'),
     
     # CKEditor

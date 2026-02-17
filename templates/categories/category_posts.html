@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ category.name }} - Category{% endblock %}
+{% block description %}{{ category.description|default:"Explore all posts in the "|add:category.name|add:" category." }}{% endblock %}
+
+{% block content %}
+
+<!-- =======================
+Inner intro START -->
+<section class="pt-4">
+	<div class="container">
+		<div class="row">
+			<div class="col-12">
+				<div class="card card-overlay-bottom h-300 overflow-hidden text-center" style="background-image:url({% if category.image %}{{ category.image.url }}{% else %}{% static 'assets/images/blog/16by9/08.jpg' %}{% endif %}); background-position: center left; background-size: cover;">
+					<!-- Card Image overlay -->
+					<div class="card-img-overlay d-flex align-items-center p-3 pb-4 px-sm-5"> 
+						<div class="col-12 mt-auto d-md-flex justify-content-between align-items-center">
+							<div>
+								{% if category.icon %}
+								<span class="display-1 d-block mb-2">{{ category.icon }}</span>
+								{% endif %}
+								<h1 class="text-white display-5">{{ category.name }}</h1>
+								{% if category.description %}
+								<p class="text-white mb-2">{{ category.description }}</p>
+								{% endif %}
+								<div class="d-flex gap-2 justify-content-center mt-2">
+									<span class="badge bg-primary bg-opacity-75 text-white">
+										<i class="bi bi-file-text me-1"></i>{{ posts.paginator.count }} post{{ posts.paginator.count|pluralize }}
+									</span>
+									<span class="badge bg-success bg-opacity-75 text-white">
+										<i class="bi bi-people me-1"></i>{{ category.author_count }} author{{ category.author_count|pluralize }}
+									</span>
+								</div>
+							</div>
+							<nav class="d-flex justify-content-center mt-3 mt-md-0" aria-label="breadcrumb">
+								<ol class="breadcrumb breadcrumb-dots mb-0">
+									<li class="breadcrumb-item"><a href="{% url 'home' %}"><i class="bi bi-house me-1"></i> Home</a></li>
+									<li class="breadcrumb-item"><a href="{% url 'category_list' %}">Categories</a></li>
+									<li class="breadcrumb-item active">{{ category.name }}</li>
+								</ol>
+							</nav>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+<!-- =======================
+Inner intro END -->
+
+<!-- =======================
+Main content START -->
+<section class="position-relative p-0 pt-4">
+	<div class="container">
+		<div class="row g-4">
+			{% if posts %}
+				{% for post in posts %}
+				<!-- Card item START -->
+				<div class="col-md-6">
+					<div class="card card-overlay-bottom card-img-scale h-100">
+						<!-- Card Image -->
+						{% if post.featured_image %}
+						<img class="card-img" src="{{ post.featured_image.url }}" alt="{{ post.title }}" style="height: 400px; object-fit: cover;">
+						{% else %}
+						<img class="card-img" src="{% static 'assets/images/blog/4by3/16.jpg' %}" alt="{{ post.title }}" style="height: 400px; object-fit: cover;">
+						{% endif %}
+						<!-- Card Image overlay -->
+						<div class="card-img-overlay d-flex align-items-center p-3 p-sm-5"> 
+							<div class="w-100 mt-auto">
+								<div class="col">
+									<!-- Card category -->
+									{% if post.category %}
+									<a href="{% url 'category_posts' post.category.slug %}" class="badge text-bg-success mb-2"><i class="fas fa-circle me-2"></i>{{ post.category.name }}</a>
+									{% endif %}
+									{% for tag in post.tags.all|slice:":2" %}
+									<a href="{% url 'tag_posts' tag.slug %}" class="badge bg-primary mb-2 me-1"><i class="fas fa-circle me-2"></i>{{ tag.name }}</a>
+									{% endfor %}
+									<!-- Card title -->
+									<h2 class="text-white display-6"><a href="{{ post.get_absolute_url }}" class="btn-link text-reset stretched-link fw-normal">{{ post.title|truncatechars:60 }}</a></h2>
+									<!-- Card info -->
+									<ul class="nav nav-divider text-white-force align-items-center d-none d-sm-inline-block">
+										<li class="nav-item">
+											<div class="nav-link">
+												<div class="d-flex align-items-center text-white position-relative">
+													<div class="avatar avatar-sm">
+														{% if post.author.profile_picture %}
+														<img class="avatar-img rounded-circle" src="{{ post.author.profile_picture.url }}" alt="{{ post.author.username }}">
+														{% else %}
+														<div class="avatar-img rounded-circle bg-primary d-flex align-items-center justify-content-center text-white">
+															{{ post.author.username|slice:":2"|upper }}
+														</div>
+														{% endif %}
+													</div>
+													<span class="ms-3">by <a href="{% url 'author_profile' post.author.username %}" class="stretched-link text-reset btn-link">{{ post.author.get_full_name|default:post.author.username }}</a></span>
+												</div>
+											</div>
+										</li>
+										<li class="nav-item">{{ post.published_date|date:"M d, Y" }}</li>
+										<li class="nav-item">
+											<a href="{{ post.get_absolute_url }}#comments" class="btn-link text-white"><i class="fas fa-comment-alt me-1"></i> {{ post.comments.count }} Comment{{ post.comments.count|pluralize }}</a>
+										</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- Card item END -->
+				{% endfor %}
+			{% else %}
+			<!-- No posts -->
+			<div class="col-12">
+				<div class="text-center py-5">
+					<div class="icon-lg bg-light rounded-circle mb-3 mx-auto d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+						<i class="bi bi-file-text fs-1 text-muted"></i>
+					</div>
+					<h3>No posts yet</h3>
+					<p class="text-muted">There are no posts in this category yet. Check back soon!</p>
+					<a href="{% url 'category_list' %}" class="btn btn-primary">Browse Other Categories</a>
+				</div>
+			</div>
+			{% endif %}
+		</div><!-- Row end -->
+
+		<!-- Pagination START -->
+		{% if posts.has_other_pages %}
+		<nav class="my-5 d-lg-flex justify-content-between align-items-center" aria-label="navigation">
+			<!-- Showing results -->
+			<p class="mb-2 mb-lg-0 text-muted">
+				Showing {{ posts.start_index }} to {{ posts.end_index }} of {{ posts.paginator.count }} posts
+			</p>
+			
+			<!-- Pagination 1 2 3 -->
+			<ul class="pagination pagination-bordered justify-content-center d-flex mb-0">
+				{% if posts.has_previous %}
+				<li class="page-item">
+					<a class="page-link" href="?page={{ posts.previous_page_number }}" aria-label="Previous">
+						<span aria-hidden="true">&laquo; Prev</span>
+					</a>
+				</li>
+				{% else %}
+				<li class="page-item disabled">
+					<span class="page-link" aria-hidden="true">&laquo; Prev</span>
+				</li>
+				{% endif %}
+
+				{% for num in posts.paginator.page_range %}
+					{% if posts.number == num %}
+					<li class="page-item active"><span class="page-link">{{ num }}</span></li>
+					{% elif num > posts.number|add:'-3' and num < posts.number|add:'3' %}
+					<li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+					{% endif %}
+				{% endfor %}
+
+				{% if posts.has_next %}
+				<li class="page-item">
+					<a class="page-link" href="?page={{ posts.next_page_number }}" aria-label="Next">
+						<span aria-hidden="true">Next &raquo;</span>
+					</a>
+				</li>
+				{% else %}
+				<li class="page-item disabled">
+					<span class="page-link" aria-hidden="true">Next &raquo;</span>
+				</li>
+				{% endif %}
+			</ul>
+		</nav>
+		{% endif %}
+		<!-- Pagination END -->
+	</div>
+</section>
+<!-- =======================
+Main content END -->
+
+{% endblock %}

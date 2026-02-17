@@ -1,0 +1,323 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Contact Us - Blogzine{% endblock %}
+{% block description %}Get in touch with us. We'd love to hear from you!{% endblock %}
+
+{% block content %}
+
+<!-- =======================
+Inner intro START -->
+<section>
+	<div class="container">
+		<div class="row">
+      <div class="col-md-9 mx-auto text-center">
+        <h1 class="display-4">Contact us</h1>
+        <!-- breadcrumb -->
+        <nav class="d-flex justify-content-center" aria-label="breadcrumb">
+          <ol class="breadcrumb breadcrumb-dots mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}"><i class="bi bi-house me-1"></i> Home</a></li>
+            <li class="breadcrumb-item active">Contact us</li>
+          </ol>
+        </nav>      
+      </div>
+    </div>
+	</div>
+</section>
+<!-- =======================
+Inner intro END -->
+
+<!-- =======================
+Contact info START -->
+<section class="pt-4">
+	<div class="container">
+		<div class="row">
+      <div class="col-xl-9 mx-auto">
+        
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          {% endfor %}
+        {% endif %}
+        
+        <div class="row mt-5">
+          <!-- Advertisement Contact -->
+          <div class="col-sm-6 mb-5 mb-sm-0">
+            <div class="card h-100 border-0 bg-light p-4">
+              <div class="card-body">
+                <div class="icon-lg bg-primary bg-opacity-10 text-primary rounded-circle mb-3">
+                  <i class="bi bi-megaphone fs-4"></i>
+                </div>
+                <h3>Advertise / Sponsorships</h3>
+                <p class="text-muted">Contact us directly related to Advertisement and Sponsorship opportunities</p>
+                <address class="mb-3">
+                  <i class="bi bi-geo-alt-fill me-2 text-primary"></i>{{ contact_info.advertise_address|default:"2492 Centennial NW, Acworth, GA, 30102" }}
+                </address>
+                <p class="mb-2">
+                  <i class="bi bi-telephone-fill me-2 text-primary"></i>
+                  <a href="tel:{{ contact_info.advertise_phone|default:'6783241251' }}" class="text-reset text-decoration-none">
+                    <u>{{ contact_info.advertise_phone|default:"(678) 324-1251 (Toll-free)" }}</u>
+                  </a>
+                </p>
+                <p class="mb-2">
+                  <i class="bi bi-envelope-fill me-2 text-primary"></i>
+                  <a href="mailto:{{ contact_info.advertise_email|default:'advertise@example.com' }}" class="text-reset text-decoration-none">
+                    <u>{{ contact_info.advertise_email|default:"advertise@example.com" }}</u>
+                  </a>
+                </p>
+                <p class="mb-0">
+                  <i class="bi bi-clock-fill me-2 text-primary"></i>
+                  Support time: {{ contact_info.advertise_hours|default:"Monday to Saturday, 9:30 am to 6:00 pm" }}
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- General Contact -->
+          <div class="col-sm-6">
+            <div class="card h-100 border-0 bg-light p-4">
+              <div class="card-body">
+                <div class="icon-lg bg-success bg-opacity-10 text-success rounded-circle mb-3">
+                  <i class="bi bi-envelope-paper fs-4"></i>
+                </div>
+                <h3>Contact Information</h3>
+                <p class="text-muted">Get in touch with us to see how we can help you with your query</p>
+                <address class="mb-3">
+                  <i class="bi bi-geo-alt-fill me-2 text-success"></i>{{ contact_info.general_address|default:"750 Sing Sing Rd, Horseheads, NY, 14845" }}
+                </address>
+                <p class="mb-2">
+                  <i class="bi bi-telephone-fill me-2 text-success"></i>
+                  <a href="tel:{{ contact_info.general_phone|default:'4695372410' }}" class="text-reset text-decoration-none">
+                    <u>{{ contact_info.general_phone|default:"469-537-2410 (Toll-free)" }}</u>
+                  </a>
+                </p>
+                <p class="mb-2">
+                  <i class="bi bi-envelope-fill me-2 text-success"></i>
+                  <a href="mailto:{{ contact_info.general_email|default:'contact@example.com' }}" class="text-reset text-decoration-none">
+                    <u>{{ contact_info.general_email|default:"contact@example.com" }}</u>
+                  </a>
+                </p>
+                <p class="mb-0">
+                  <i class="bi bi-clock-fill me-2 text-success"></i>
+                  Support time: {{ contact_info.general_hours|default:"Monday to Saturday, 9:00 am to 5:30 pm" }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <hr class="my-5">
+        
+        <div class="row">
+          <div class="col-12">
+            <div class="text-center mb-4">
+              <h2>Send us a message</h2>
+              <p class="text-muted">Please fill in the form below and we will contact you very soon. Your email address will not be published.</p>
+            </div>
+            
+            <!-- Form START -->
+            <form class="contact-form" id="contact-form" method="POST" action="{% url 'contact_submit' %}">
+              {% csrf_token %}
+              
+              <!-- Main form -->
+              <div class="row g-4">
+                <div class="col-md-6">
+                  <!-- name -->
+                  <div class="form-group">
+                    <label class="form-label fw-bold">Your Name <span class="text-danger">*</span></label>
+                    <input required id="con-name" name="name" type="text" class="form-control form-control-lg" 
+                           placeholder="Enter your full name" value="{{ form.name.value|default:'' }}">
+                    {% if form.name.errors %}
+                      <div class="text-danger small mt-1">{{ form.name.errors.0 }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+                
+                <div class="col-md-6">
+                  <!-- email -->
+                  <div class="form-group">
+                    <label class="form-label fw-bold">Email Address <span class="text-danger">*</span></label>
+                    <input required id="con-email" name="email" type="email" class="form-control form-control-lg" 
+                           placeholder="Enter your email address" value="{{ form.email.value|default:'' }}">
+                    {% if form.email.errors %}
+                      <div class="text-danger small mt-1">{{ form.email.errors.0 }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+                
+                <div class="col-md-6">
+                  <!-- phone (optional) -->
+                  <div class="form-group">
+                    <label class="form-label fw-bold">Phone Number (Optional)</label>
+                    <input id="con-phone" name="phone" type="tel" class="form-control form-control-lg" 
+                           placeholder="Enter your phone number" value="{{ form.phone.value|default:'' }}">
+                  </div>
+                </div>
+                
+                <div class="col-md-6">
+                  <!-- Subject -->
+                  <div class="form-group">
+                    <label class="form-label fw-bold">Subject <span class="text-danger">*</span></label>
+                    <select id="con-subject" name="subject" class="form-select form-control-lg" required>
+                      <option value="" {% if not form.subject.value %}selected{% endif %} disabled>Select a subject</option>
+                      <option value="general" {% if form.subject.value == 'general' %}selected{% endif %}>General Inquiry</option>
+                      <option value="advertise" {% if form.subject.value == 'advertise' %}selected{% endif %}>Advertising / Sponsorship</option>
+                      <option value="support" {% if form.subject.value == 'support' %}selected{% endif %}>Technical Support</option>
+                      <option value="feedback" {% if form.subject.value == 'feedback' %}selected{% endif %}>Feedback / Suggestion</option>
+                      <option value="other" {% if form.subject.value == 'other' %}selected{% endif %}>Other</option>
+                    </select>
+                    {% if form.subject.errors %}
+                      <div class="text-danger small mt-1">{{ form.subject.errors.0 }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+                
+                <div class="col-md-12">
+                  <!-- Message -->
+                  <div class="form-group">
+                    <label class="form-label fw-bold">Your Message <span class="text-danger">*</span></label>
+                    <textarea required id="con-message" name="message" cols="40" rows="6" 
+                              class="form-control form-control-lg" placeholder="Write your message here...">{{ form.message.value|default:'' }}</textarea>
+                    {% if form.message.errors %}
+                      <div class="text-danger small mt-1">{{ form.message.errors.0 }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+                
+                <!-- reCAPTCHA (if enabled) -->
+                {% if recaptcha_enabled %}
+                <div class="col-md-12">
+                  <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}"></div>
+                </div>
+                {% endif %}
+                
+                <!-- submit button -->
+                <div class="col-md-12 text-center">
+                  <button class="btn btn-primary btn-lg px-5" type="submit" id="submit-btn">
+                    <i class="bi bi-send-fill me-2"></i>Send Message
+                  </button>
+                </div>
+              </div>
+            </form>
+            <!-- Form END -->
+            
+            <!-- Success message (hidden by default) -->
+            <div id="success-message" class="alert alert-success mt-4 d-none" role="alert">
+              <i class="bi bi-check-circle-fill me-2"></i>
+              <span id="success-text"></span>
+            </div>
+          </div>
+        </div>
+      </div>  <!-- Col END -->
+     </div>
+  </div>
+</section>
+<!-- =======================
+Contact info END -->
+
+<!-- =======================
+Map START -->
+<section class="pt-0">
+  <div class="container">
+    <div class="row">
+      <div class="col-12">
+        <div class="card border-0 bg-light p-4">
+          <h3 class="mb-3">Find us on map</h3>
+          <div class="ratio ratio-21x9">
+            <iframe src="{{ contact_info.map_embed_url|default:'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d193595.15830869428!2d-74.119763973046!3d40.69766374874431!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c24fa5d33f083b%3A0xc80b8f06e177fe62!2sNew%20York%2C%20NY%2C%20USA!5e0!3m2!1sen!2sin!4v1698912345678!5m2!1sen!2sin' }}" 
+                    style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- =======================
+Map END -->
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const contactForm = document.getElementById('contact-form');
+  const submitBtn = document.getElementById('submit-btn');
+  const successMessage = document.getElementById('success-message');
+  const successText = document.getElementById('success-text');
+  
+  if (contactForm) {
+    contactForm.addEventListener('submit', function(e) {
+      // Show loading state
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Sending...';
+      
+      // Form will submit normally to the server
+      // The loading state will be reset on page reload
+      
+      // Optional: Add AJAX submission here if desired
+      /*
+      e.preventDefault();
+      
+      const formData = new FormData(contactForm);
+      
+      fetch(contactForm.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          contactForm.reset();
+          successText.textContent = data.message;
+          successMessage.classList.remove('d-none');
+          setTimeout(() => {
+            successMessage.classList.add('d-none');
+          }, 5000);
+        } else {
+          alert('Error: ' + data.message);
+        }
+      })
+      .catch(error => {
+        alert('An error occurred. Please try again.');
+      })
+      .finally(() => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="bi bi-send-fill me-2"></i>Send Message';
+      });
+      */
+    });
+  }
+  
+  // Input validation styling
+  const inputs = document.querySelectorAll('.form-control, .form-select');
+  inputs.forEach(input => {
+    input.addEventListener('blur', function() {
+      if (this.hasAttribute('required') && !this.value.trim()) {
+        this.classList.add('is-invalid');
+      } else {
+        this.classList.remove('is-invalid');
+        this.classList.add('is-valid');
+      }
+    });
+    
+    input.addEventListener('input', function() {
+      if (this.hasAttribute('required') && this.value.trim()) {
+        this.classList.remove('is-invalid');
+        this.classList.add('is-valid');
+      }
+    });
+  });
+});
+</script>
+
+<!-- reCAPTCHA script if enabled -->
+{% if recaptcha_enabled %}
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+{% endif %}
+{% endblock %}
