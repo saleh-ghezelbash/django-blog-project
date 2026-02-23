@@ -13,7 +13,78 @@ from newsletter.models import Subscriber
 
 
 
-
+@login_required
+def manage_posts(request):
+    """View for users to manage their posts"""
+    # Base queryset - filter by user unless staff
+    if request.user.is_staff:
+        posts = Post.objects.all()
+    else:
+        posts = Post.objects.filter(author=request.user)
+    
+    # Annotate with comment count
+    posts = posts.annotate(comments_count=Count('comments'))
+    
+    # Search filter
+    search_query = request.GET.get('search', '')
+    if search_query:
+        posts = posts.filter(
+            Q(title__icontains=search_query) |
+            Q(content__icontains=search_query) |
+            Q(excerpt__icontains=search_query)
+        )
+    
+    # Category filter
+    category_filter = request.GET.get('category', '')
+    if category_filter and category_filter.isdigit():
+        posts = posts.filter(category_id=category_filter)
+    
+    # Status filter
+    status_filter = request.GET.get('status', '')
+    if status_filter in ['published', 'draft']:
+        posts = posts.filter(status=status_filter)
+    
+    # Approved status filter (custom field if you have it)
+    approved_filter = request.GET.get('approved', '')
+    if approved_filter:
+        # Assuming you have an is_approved field
+        if approved_filter == 'approved':
+            posts = posts.filter(is_approved=True)
+        elif approved_filter == 'pending':
+            posts = posts.filter(is_approved=None)
+        elif approved_filter == 'rejected':
+            posts = posts.filter(is_approved=False)
+    
+    # Sorting
+    sort_by = request.GET.get('sort', '-published_date')
+    if sort_by in ['published_date', '-published_date', 'title', '-title', 'views_count', '-views_count', 'comments_count', '-comments_count']:
+        posts = posts.order_by(sort_by)
+    else:
+        posts = posts.order_by('-published_date')
+    
+    # Pagination
+    paginator = Paginator(posts, 10)  # 10 posts per page
+    page = request.GET.get('page')
+    posts_page = paginator.get_page(page)
+    
+    # Get all categories for filter dropdown
+    categories = Category.objects.all()
+    
+    # Get total count for the badge
+    total_posts = posts.count()
+    
+    context = {
+        'posts': posts_page,
+        'categories': categories,
+        'total_posts': total_posts,
+        'search_query': search_query,
+        'category_filter': category_filter,
+        'status_filter': status_filter,
+        'approved_filter': approved_filter,
+        'sort_by': sort_by,
+    }
+    
+    return render(request, 'posts/manage_posts.html', context)
 
 def home(request):
     """Home page view with all sections"""

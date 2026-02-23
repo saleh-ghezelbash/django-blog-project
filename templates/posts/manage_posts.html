@@ -1,0 +1,313 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Manage Posts - {{ block.super }}{% endblock %}
+
+{% block content %}
+
+<!-- =======================
+Page header START -->
+<section class="py-4">
+	<div class="container">
+		<div class="row">
+			<div class="col-12">
+				<!-- Title -->
+				<h1 class="display-6">Manage Posts</h1>
+				<p class="lead">View and manage all your blog posts</p>
+			</div>
+		</div>
+	</div>
+</section>
+<!-- =======================
+Page header END -->
+
+<!-- =======================
+Main content START -->
+<section class="pt-0">
+	<div class="container">
+		<div class="row">
+			<div class="col-12">
+				<!-- Blog post table START -->
+				<div class="card border bg-transparent rounded-3">
+					<!-- Card header START -->
+					<div class="card-header bg-transparent border-bottom p-3">
+						<div class="d-flex justify-content-between align-items-center">
+							<h5 class="mb-2 mb-sm-0">
+								Blog Posts 
+								<span class="badge bg-primary bg-opacity-10 text-primary">{{ total_posts }}</span>
+							</h5>
+							<a href="{% url 'post_create' %}" class="btn btn-sm btn-primary mb-0">
+								<i class="bi bi-plus-circle me-2"></i>Add New
+							</a>
+						</div>
+					</div>
+					<!-- Card header END -->
+
+					<!-- Card body START -->
+					<div class="card-body">
+
+						<!-- Search and filter START -->
+						<div class="row g-3 align-items-center justify-content-between mb-3">
+							<!-- Search -->
+							<div class="col-md-4">
+								<form class="rounded position-relative" method="GET" action="{% url 'manage_posts' %}">
+									<input class="form-control pe-5 bg-transparent" type="search" name="search" placeholder="Search in blog title" value="{{ search_query }}" aria-label="Search">
+									<button class="btn bg-transparent border-0 px-2 py-0 position-absolute top-50 end-0 translate-middle-y" type="submit">
+										<i class="fas fa-search fs-6"></i>
+									</button>
+								</form>
+							</div>
+
+							<!-- Filter options -->
+							<div class="col-md-8">
+								<form method="GET" action="{% url 'manage_posts' %}" class="row g-2">
+									<div class="col-md-4">
+										<select class="form-select z-index-9 bg-transparent" name="category" onchange="this.form.submit()">
+											<option value="">All Categories</option>
+											{% for category in categories %}
+											<option value="{{ category.id }}" {% if category_filter == category.id|stringformat:"s" %}selected{% endif %}>
+												{{ category.name }}
+											</option>
+											{% endfor %}
+										</select>
+									</div>
+									
+									<div class="col-md-3">
+										<select class="form-select z-index-9 bg-transparent" name="status" onchange="this.form.submit()">
+											<option value="">All Status</option>
+											<option value="published" {% if status_filter == 'published' %}selected{% endif %}>Published</option>
+											<option value="draft" {% if status_filter == 'draft' %}selected{% endif %}>Draft</option>
+										</select>
+									</div>
+									
+									<div class="col-md-3">
+										<select class="form-select z-index-9 bg-transparent" name="approved" onchange="this.form.submit()">
+											<option value="">Approval Status</option>
+											<option value="approved" {% if approved_filter == 'approved' %}selected{% endif %}>Approved</option>
+											<option value="pending" {% if approved_filter == 'pending' %}selected{% endif %}>Pending</option>
+											<option value="rejected" {% if approved_filter == 'rejected' %}selected{% endif %}>Rejected</option>
+										</select>
+									</div>
+									
+									<div class="col-md-2">
+										<select class="form-select z-index-9 bg-transparent" name="sort" onchange="this.form.submit()">
+											<option value="-published_date" {% if sort_by == '-published_date' %}selected{% endif %}>Newest</option>
+											<option value="published_date" {% if sort_by == 'published_date' %}selected{% endif %}>Oldest</option>
+											<option value="-views_count" {% if sort_by == '-views_count' %}selected{% endif %}>MostViewed</option>
+											<option value="-comments_count" {% if sort_by == '-comments_count' %}selected{% endif %}>Most Commented</option>
+											<option value="title" {% if sort_by == 'title' %}selected{% endif %}>Title A-Z</option>
+										</select>
+									</div>
+									
+									{% if search_query or category_filter or status_filter or approved_filter or sort_by != '-published_date' %}
+									<div class="col-md-12 text-end">
+										<a href="{% url 'manage_posts' %}" class="btn btn-sm btn-secondary-soft">
+											<i class="bi bi-x-circle me-1"></i>Clear Filters
+										</a>
+									</div>
+									{% endif %}
+								</form>
+							</div>
+						</div>
+						<!-- Search and filter END -->
+
+						<!-- Blog post table START -->
+						<div class="table-responsive border-0">
+							<table class="table align-middle p-4 mb-0 table-hover table-shrink">
+								<!-- Table head -->
+								<thead class="table-dark">
+									<tr>
+										<th scope="col" class="border-0 rounded-start">Blog Title</th>
+										<th scope="col" class="border-0">Views</th>
+										<th scope="col" class="border-0">Comments</th>
+										<th scope="col" class="border-0">Category</th>
+										<th scope="col" class="border-0">Approved Status</th>
+										<th scope="col" class="border-0">Status</th>
+										<th scope="col" class="border-0">Published Date</th>
+										<th scope="col" class="border-0 rounded-end">Actions</th>
+									</tr>
+								</thead>
+
+								<!-- Table body START -->
+								<tbody class="border-top-0">
+									{% for post in posts %}
+									<!-- Table item -->
+									<tr>
+										<!-- Table data - Title -->
+										<td>
+											<h6 class="table-title mt-2 mt-md-0 mb-0">
+												<a href="{{ post.get_absolute_url }}" target="_blank">{{ post.title|truncatechars:50 }}</a>
+											</h6>
+											<small class="text-muted">ID: #{{ post.id }}</small>
+										</td>
+										
+										<!-- Table data - Views -->
+										<td>
+											<span class="fw-bold">{{ post.views_count|default:0 }}</span>
+										</td>
+										
+										<!-- Table data - Comments -->
+										<td>
+											<a href="{{ post.get_absolute_url }}#comments" class="text-reset">{{ post.comments.count }}</a>
+										</td>
+										
+										<!-- Table data - Category -->
+										<td>
+											{% if post.category %}
+											<a href="{% url 'category_posts' post.category.slug %}" class="badge text-bg-warning mb-2" target="_blank">
+												<i class="fas fa-circle me-2 small fw-bold"></i>{{ post.category.name }}
+											</a>
+											{% else %}
+											<span class="badge text-bg-secondary">Uncategorized</span>
+											{% endif %}
+										</td>
+										
+										<!-- Table data - Approved Status -->
+										<td>
+											{% if post.is_approved %}
+											<span class="badge bg-success bg-opacity-10 text-success">Approved</span>
+											{% elif post.is_approved == False %}
+											<span class="badge bg-danger bg-opacity-10 text-danger">Rejected</span>
+											{% else %}
+											<span class="badge bg-warning bg-opacity-10 text-warning">Pending</span>
+											{% endif %}
+										</td>
+										
+										<!-- Table data - Status -->
+										<td>
+											{% if post.status == 'published' %}
+											<span class="badge bg-success bg-opacity-10 text-success">Published</span>
+											{% else %}
+											<span class="badge bg-warning bg-opacity-10 text-warning">Draft</span>
+											{% endif %}
+										</td>
+										
+										<!-- Table data - Published Date -->
+										<td>{{ post.published_date|date:"M d, Y" }}</td>
+										
+										<!-- Table data - Actions -->
+										<td>
+											<div class="d-flex gap-2">
+												<a href="{% url 'post_delete' post.id %}" class="btn btn-light btn-round mb-0" 
+												   data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"
+												   onclick="return confirm('Are you sure you want to delete this post?');">
+													<i class="bibi-trash"></i>
+												</a>
+												<a href="{% url 'post_update' post.id %}" class="btn btn-light btn-round mb-0" 
+												   data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
+													<i class="bi bi-pencil-square"></i>
+												</a>
+												<a href="{{ post.get_absolute_url }}" class="btn btn-light btn-round mb-0" 
+												   data-bs-toggle="tooltip" data-bs-placement="top" title="View" target="_blank">
+													<i class="bi bi-eye"></i>
+												</a>
+												{% if user.is_staff %}
+												<a href="{% url 'admin:posts_post_change' post.id %}" class="btn btn-light btn-round mb-0" 
+												   data-bs-toggle="tooltip" data-bs-placement="top" title="Admin Edit">
+													<i class="bi bi-shield"></i>
+												</a>
+												{% endif %}
+											</div>
+										</td>
+									</tr>
+									{% empty %}
+									<!-- No posts -->
+									<tr>
+										<td colspan="8" class="text-center py-5">
+											<div class="text-center">
+												<i class="bi bi-file-text display-1 text-muted mb-3"></i>
+												<h5>No posts found</h5>
+												<p class="text-muted">{% if search_query %}No posts match your search criteria.{% else %}You haven't created any posts yet.{% endif %}</p>
+												<a href="{% url 'post_create' %}" class="btn btn-primary mt-2">
+													<i class="bi bi-plus-circle me-2"></i>Create Your First Post
+												</a>
+											</div>
+										</td>
+									</tr>
+									{% endfor %}
+								</tbody>
+								<!-- Table body END -->
+							</table>
+						</div>
+						<!-- Blog post table END -->
+
+						<!-- Pagination START -->
+						{% if posts.has_other_pages %}
+						<div class="d-sm-flex justify-content-sm-between align-items-sm-center mt-4 mt-sm-3">
+							<!-- Content -->
+							<p class="mb-sm-0 text-center text-sm-start">
+								Showing {{ posts.start_index }} to {{ posts.end_index }} of {{ posts.paginator.count }} entries
+							</p>
+							<!-- Pagination -->
+							<nav class="mb-sm-0 d-flex justify-content-center" aria-label="navigation">
+								<ul class="pagination pagination-sm pagination-bordered mb-0">
+									{% if posts.has_previous %}
+									<li class="page-item">
+										<a class="page-link" href="?page={{ posts.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if approved_filter %}&approved={{ approved_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}" tabindex="-1">
+											Prev
+										</a>
+									</li>
+									{% else %}
+									<li class="page-item disabled">
+										<a class="page-link" href="#" tabindex="-1" aria-disabled="true">Prev</a>
+									</li>
+									{% endif %}
+									
+									{% for num in posts.paginator.page_range %}
+										{% if posts.number == num %}
+										<li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+										{% elif num > posts.number|add:'-3' and num < posts.number|add:'3' %}
+										<li class="page-item">
+											<a class="page-link" href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if approved_filter %}&approved={{ approved_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">
+												{{ num }}
+											</a>
+										</li>
+										{% endif %}
+									{% endfor %}
+									
+									{% if posts.has_next %}
+									<li class="page-item">
+										<a class="page-link" href="?page={{ posts.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if approved_filter %}&approved={{ approved_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif%}">
+											Next
+										</a>
+									</li>
+									{% else %}
+									<li class="page-item disabled">
+										<a class="page-link" href="#">Next</a>
+									</li>
+									{% endif %}
+								</ul>
+							</nav>
+						</div>
+						{% endif %}
+						<!-- Pagination END -->
+					</div>
+				</div>
+				<!-- Blog post table END -->
+			</div>
+		</div>
+	</div>
+</section>
+<!-- =======================
+Main content END -->
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+	// Initialize tooltips
+	document.addEventListener('DOMContentLoaded', function() {
+		var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+		var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+			return new bootstrap.Tooltip(tooltipTriggerEl)
+		});
+		
+		// Auto-submit on filter change
+		document.querySelectorAll('.filter-select').forEach(select => {
+			select.addEventListener('change', function() {
+				this.form.submit();
+			});
+		});
+	});
+</script>
+{% endblock %}

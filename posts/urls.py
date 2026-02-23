@@ -11,4 +11,5 @@ urlpatterns = [
          views.post_detail, name='post_detail'),
     path('search/', views.search, name='search'),
     path('search/advanced/', views.advanced_search, name='advanced_search'),
+    path('manage/posts/', views.manage_posts, name='manage_posts'),
 ]
