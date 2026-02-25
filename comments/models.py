@@ -71,6 +71,28 @@ class Comment(models.Model):
         self.moderated_at = timezone.now()
         self.save()
 
+    def upvote_count(self):
+        """Get number of upvotes for this comment"""
+        return self.votes.filter(vote=1).count()
+    
+    def downvote_count(self):
+        """Get number of downvotes for this comment"""
+        return self.votes.filter(vote=-1).count()
+    
+    def vote_score(self):
+        """Get net vote score"""
+        return self.upvote_count() - self.downvote_count()
+    
+    def user_vote(self, user):
+        """Get a specific user's vote on this comment"""
+        if user.is_authenticated:
+            try:
+                vote = self.votes.get(user=user)
+                return vote.vote
+            except CommentVote.DoesNotExist:
+                return 0
+        return 0    
+
 class CommentVote(models.Model):
     """Model for comment likes/dislikes"""
     VOTE_CHOICES = (

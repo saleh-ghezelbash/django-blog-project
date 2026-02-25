@@ -73,7 +73,7 @@
                                     <tr>
                                         <td>{{ post.title|truncatechars:30 }}</td>
                                         <td>{{ post.published_date|date:"M d, Y" }}</td>
-                                        <td>{{ post.views_count }}</td>
+                                        <td>{{ post.view_count }}</td>
                                         <td>{{ post.comments.count }}</td>
                                         <td>
                                             <span class="badge {% if post.status == 'published' %}bg-success{% else %}bg-warning{% endif %}">

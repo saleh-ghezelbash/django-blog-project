@@ -93,7 +93,7 @@ Main content START -->
 										<select class="form-select z-index-9 bg-transparent" name="sort" onchange="this.form.submit()">
 											<option value="-published_date" {% if sort_by == '-published_date' %}selected{% endif %}>Newest</option>
 											<option value="published_date" {% if sort_by == 'published_date' %}selected{% endif %}>Oldest</option>
-											<option value="-views_count" {% if sort_by == '-views_count' %}selected{% endif %}>MostViewed</option>
+											<option value="-view_count" {% if sort_by == '-view_count' %}selected{% endif %}>MostViewed</option>
 											<option value="-comments_count" {% if sort_by == '-comments_count' %}selected{% endif %}>Most Commented</option>
 											<option value="title" {% if sort_by == 'title' %}selected{% endif %}>Title A-Z</option>
 										</select>
@@ -143,7 +143,7 @@ Main content START -->
 										
 										<!-- Table data - Views -->
 										<td>
-											<span class="fw-bold">{{ post.views_count|default:0 }}</span>
+											<span class="fw-bold">{{ post.view_count|default:0 }}</span>
 										</td>
 										
 										<!-- Table data - Comments -->

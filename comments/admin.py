@@ -1,5 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
+from django.urls import reverse
+from django.utils import timezone
 from .models import Comment, CommentVote, CommentReport
 
 class CommentVoteInline(admin.TabularInline):
@@ -39,9 +41,18 @@ class CommentAdmin(admin.ModelAdmin):
     
     def author_name(self, obj):
         if obj.author:
-            return format_html('<a href="{}">{}</a>', 
-                             reverse('admin:auth_user_change', args=[obj.author.id]),
-                             obj.author.username)
+            # Option 1: Link to the user change page in admin
+            try:
+                url = reverse('admin:users_customuser_change', args=[obj.author.id])
+                return format_html('<a href="{}">{}</a>', url, obj.author.username)
+            except:
+                # Option 2: If using default User model
+                try:
+                    url = reverse('admin:auth_user_change', args=[obj.author.id])
+                    return format_html('<a href="{}">{}</a>', url, obj.author.username)
+                except:
+                    # Option 3: Just return the username without link
+                    return obj.author.username
         return obj.name or 'Anonymous'
     author_name.short_description = 'Author'
     

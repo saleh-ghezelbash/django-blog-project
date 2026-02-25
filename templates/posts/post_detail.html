@@ -2,13 +2,73 @@
 {% load static %}
 
 {% block content %}
-<section class="pt-0">
+<!-- =======================
+Inner intro START -->
+<section class="pt-2">
+	<div class="container">
+		<div class="row">
+      <div class="col-12">
+        <div class="card bg-dark-overlay-5 overflow-hidden card-bg-scale h-400 text-center" style="background-image:url({% if post.featured_image %}{{ post.featured_image.url }}{% else %}{% static 'assets/images/blog/16by9/06.jpg' %}{% endif %}); background-position: center left; background-size: cover;">
+          <!-- Card Image overlay -->
+          <div class="card-img-overlay d-flex align-items-center p-3 p-sm-4"> 
+            <div class="w-100 my-auto">
+              <!-- Card category -->
+              {% if post.category %}
+              <a href="{% url 'category_posts' post.category.slug %}" class="badge text-bg-danger mb-2">
+                <i class="fas fa-circle me-2 small fw-bold"></i>{{ post.category.name }}
+              </a>
+              {% endif %}
+              <!-- Card title -->
+              <h2 class="text-white display-5">{{ post.title }}</h2>
+              <!-- Card info -->
+              <ul class="nav nav-divider text-white-force align-items-center justify-content-center">
+                <li class="nav-item">
+                  <div class="nav-link">
+                    <div class="d-flex align-items-center text-white position-relative">
+                      <div class="avatar avatar-sm">
+                        {% if post.author.profile_picture %}
+                        <img class="avatar-img rounded-circle" src="{{ post.author.profile_picture.url }}" alt="{{ post.author.username }}">
+                        {% else %}
+                        <div class="avatar-img rounded-circle bg-primary d-flex align-items-center justify-content-center text-white">
+                          {{ post.author.username|slice:":2"|upper }}
+                        </div>
+                        {% endif %}
+                      </div>
+                      <span class="ms-3">
+                        {% if post.author %}
+                        by <a href="{% url 'author_profile' post.author.username %}" class="stretched-link text-reset btn-link">
+                          {{ post.author.get_full_name|default:post.author.username }}
+                        </a>
+                        {% else %}
+                        by <span class="text-white-50">Unknown Author</span>
+                        {% endif %}
+                      </span>
+                    </div>
+                  </div>
+                </li>
+                <li class="nav-item">{{ post.published_date|date:"M d, Y" }}</li>
+                <li class="nav-item">{{ post.get_read_time }} min read</li>
+                <li class="nav-item">
+                  <i class="bi bi-eye me-1"></i> {{ post.view_count }}
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+	</div>
+</section>
+<!-- =======================
+Inner intro END -->
+
+<section class="pt-4">
     <div class="container position-relative" data-sticky-container>
         <div class="row">
             <!-- Main Content START -->
             <div class="col-lg-9 mb-5">
                 <!-- Post Content -->
-                <p><span class="dropcap bg-dark text-white px-2">{{ post.content|slice:":1" }}</span>{{ post.content|safe }}</p>
+                <p>{{ post.content|safe }}</p>
 
                 <!-- Post Images -->
                 {% if post.images.all %}
@@ -22,6 +82,36 @@
                     {% endfor %}
                 </div>
                 {% endif %}
+
+                <!-- Like - Dislike START -->
+                <div class="like-section my-4">
+                    <h5>Did you find this helpful?</h5>
+                    <div class="d-flex align-items-center gap-3">
+                        {% if user.is_authenticated %}
+                        <button class="btn {% if post.user_vote == True %}btn-success{% else %}btn-outline-success{% endif %} like-btn" 
+                                data-post-id="{{ post.id }}" data-vote-type="like">
+                            <i class="bi bi-hand-thumbs-up me-2"></i>
+                            <span class="like-count">{{ post.likes_count }}</span> Like{{ post.likes_count|pluralize }}
+                        </button>
+                        <button class="btn {% if post.user_vote == False %}btn-danger{% else %}btn-outline-danger{% endif %} dislike-btn" 
+                                data-post-id="{{ post.id }}" data-vote-type="dislike">
+                            <i class="bi bi-hand-thumbs-down me-2"></i>
+                            <span class="dislike-count">{{ post.dislikes_count }}</span> Dislike{{ post.dislikes_count|pluralize }}
+                        </button>
+                        {% else %}
+                        <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Login to vote
+                        </a>
+                        {% endif %}
+                    </div>
+                    <div class="vote-stats mt-2">
+                        <small class="text-muted">
+                            <span class="total-votes">{{ post.total_votes }}</span> total vote{{ post.total_votes|pluralize }} • 
+                            <span class="net-votes">{{ post.net_votes }}</span> net votes
+                        </small>
+                    </div>
+                </div>
+                <!-- Like - Dislike END -->
 
                 <!-- Author info START -->
                 <div class="d-flex p-2 p-md-4 my-3 bg-primary bg-opacity-10 rounded">
@@ -346,6 +436,60 @@ document.addEventListener('DOMContentLoaded', function() {
             notification.remove();
         }, 5000);
     }
+});
+</script>
+
+<!-- Add this JavaScript for AJAX voting -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle like/dislike clicks
+    document.querySelectorAll('.like-btn, .dislike-btn').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const postId = this.dataset.postId;
+            const voteType = this.dataset.voteType;
+            const url = voteType === 'like' ? `/posts/${postId}/like/` : `/posts/${postId}/dislike/`;
+            
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'X-Requested-With': 'XMLHttpRequest',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update counts
+                    document.querySelector('.like-count').textContent = data.likes_count;
+                    document.querySelector('.dislike-count').textContent = data.dislikes_count;
+                    document.querySelector('.total-votes').textContent = data.total_votes;
+                    document.querySelector('.net-votes').textContent = data.net_votes;
+                    
+                    // Update button states
+                    const likeBtn = document.querySelector('.like-btn');
+                    const dislikeBtn = document.querySelector('.dislike-btn');
+                    
+                    if (data.user_vote === true) {
+                        likeBtn.classList.remove('btn-outline-success');
+                        likeBtn.classList.add('btn-success');
+                        dislikeBtn.classList.remove('btn-danger');
+                        dislikeBtn.classList.add('btn-outline-danger');
+                    } else if (data.user_vote === false) {
+                        dislikeBtn.classList.remove('btn-outline-danger');
+                        dislikeBtn.classList.add('btn-danger');
+                        likeBtn.classList.remove('btn-success');
+                        likeBtn.classList.add('btn-outline-success');
+                    } else {
+                        likeBtn.classList.remove('btn-success');
+                        likeBtn.classList.add('btn-outline-success');
+                        dislikeBtn.classList.remove('btn-danger');
+                        dislikeBtn.classList.add('btn-outline-danger');
+                    }
+                }
+            });
+        });
+    });
 });
 </script>
 {% endblock %}

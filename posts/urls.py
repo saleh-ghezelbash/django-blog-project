@@ -12,4 +12,7 @@ urlpatterns = [
     path('search/', views.search, name='search'),
     path('search/advanced/', views.advanced_search, name='advanced_search'),
     path('manage/posts/', views.manage_posts, name='manage_posts'),
+    path('posts/<int:post_id>/like/', views.like_post, name='like_post'),
+    path('posts/<int:post_id>/dislike/', views.dislike_post, name='dislike_post'),
+    path('posts/<int:post_id>/votes/', views.get_post_votes, name='get_post_votes'),
 ]

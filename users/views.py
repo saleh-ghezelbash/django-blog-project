@@ -76,7 +76,7 @@ def author_profile(request, username):
     elif sort == 'oldest':
         posts = posts.order_by('published_date')
     elif sort == 'popular':
-        posts = posts.order_by('-views_count', '-published_date')
+        posts = posts.order_by('-view_count', '-published_date')
     elif sort == 'commented':
         posts = posts.annotate(
             comment_count=Count('comments', distinct=True)
@@ -84,7 +84,7 @@ def author_profile(request, username):
     
     # Calculate author stats
     total_posts = posts.count()
-    total_views = posts.aggregate(Sum('views_count'))['views_count__sum'] or 0
+    total_views = posts.aggregate(Sum('view_count'))['view_count__sum'] or 0
     
     # Calculate total comments for author's posts
     total_comments = Comment.objects.filter(
@@ -94,7 +94,7 @@ def author_profile(request, username):
     ).count()
     
     # Get popular posts for sidebar
-    popular_posts = posts.order_by('-views_count')[:3]
+    popular_posts = posts.order_by('-view_count')[:3]
     
     # Get category distribution
     category_dist = posts.values('category__name').annotate(
@@ -181,7 +181,7 @@ def author_list(request):
     """List all authors with their stats"""
     authors = CustomUser.objects.annotate(
         post_count=Count('blog_posts', filter=Q(blog_posts__status='published')),
-        total_views=Sum('blog_posts__views_count')
+        total_views=Sum('blog_posts__view_count')
     ).filter(post_count__gt=0).order_by('-post_count')
     
     # Add comment count separately (more efficient than annotating)

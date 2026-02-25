@@ -4,13 +4,67 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q, Count
 from django.utils import timezone
-from .models import Post
 from .forms import PostForm, CommentForm
 from categories.models import Category
 from comments.models import Comment
 from taggit.models import Tag
 from newsletter.models import Subscriber
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from .models import Post, PostLike
 
+@login_required
+@require_POST
+def like_post(request, post_id):
+    """Handle post likes"""
+    post = get_object_or_404(Post, id=post_id, status='published')
+    
+    result = PostLike.toggle_like(post, request.user)
+    
+    return JsonResponse({
+        'success': True,
+        'action': result['action'],
+        'likes_count': post.likes_count(),
+        'dislikes_count': post.dislikes_count(),
+        'total_votes': post.total_votes(),
+        'net_votes': post.net_votes(),
+        'like_percentage': post.like_percentage(),
+        'user_vote': result['is_like'],
+    })
+
+@login_required
+@require_POST
+def dislike_post(request, post_id):
+    """Handle post dislikes"""
+    post = get_object_or_404(Post, id=post_id, status='published')
+    
+    result = PostLike.toggle_dislike(post, request.user)
+    
+    return JsonResponse({
+        'success': True,
+        'action': result['action'],
+        'likes_count': post.likes_count(),
+        'dislikes_count': post.dislikes_count(),
+        'total_votes': post.total_votes(),
+        'net_votes': post.net_votes(),
+        'like_percentage': post.like_percentage(),
+        'user_vote': result['is_like'],
+    })
+
+@login_required
+def get_post_votes(request, post_id):
+    """Get vote counts for a post (AJAX)"""
+    post = get_object_or_404(Post, id=post_id)
+    
+    return JsonResponse({
+        'success': True,
+        'likes_count': post.likes_count(),
+        'dislikes_count': post.dislikes_count(),
+        'total_votes': post.total_votes(),
+        'net_votes': post.net_votes(),
+        'like_percentage': post.like_percentage(),
+        'user_vote': post.user_vote(request.user),
+    })
 
 
 @login_required
@@ -57,7 +111,7 @@ def manage_posts(request):
     
     # Sorting
     sort_by = request.GET.get('sort', '-published_date')
-    if sort_by in ['published_date', '-published_date', 'title', '-title', 'views_count', '-views_count', 'comments_count', '-comments_count']:
+    if sort_by in ['published_date', '-published_date', 'title', '-title', 'view_count', '-view_count', 'comments_count', '-comments_count']:
         posts = posts.order_by(sort_by)
     else:
         posts = posts.order_by('-published_date')
@@ -98,7 +152,7 @@ def home(request):
     # Highlights posts (recent popular posts)
     highlights_posts = Post.objects.filter(
         status='published'
-    ).order_by('-views_count', '-published_date')[:8]
+    ).order_by('-view_count', '-published_date')[:8]
     
     # Top highlights (last week's most viewed)
     from django.utils import timezone
@@ -108,7 +162,7 @@ def home(request):
     top_highlights = Post.objects.filter(
         status='published',
         published_date__gte=last_week
-    ).order_by('-views_count')[:5]
+    ).order_by('-view_count')[:5]
     
     # Trending categories
     trending_categories = Category.objects.annotate(
